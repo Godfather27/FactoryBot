@@ -234,12 +234,17 @@ $user = FactoryBot::build(UserModel::class);
 $user->getEmail() # > "user1@has-to-be.com"
 ```
 
+
 ## using FactoryBot with php faker
 
 Faker methods should always be called inside Closure functions. This way the faker method will be called on building.
 Otherwise the faker method will be called on definition and all instances will have the same value.
 
+using a local instance of faker:
 ```php
+use Faker\Factory;
+use FactoryBot\FactoryBot;
+
 $faker = Factory::create('at_AT');
 FactoryBot::define(UserModel::class, [
     "name" => "Jane Doe",
@@ -247,7 +252,11 @@ FactoryBot::define(UserModel::class, [
 ]);
 ```
 
+using an instance variable:
 ```php
+use Faker\Factory;
+use FactoryBot\FactoryBot;
+
 class FactorySetup
 {
     /**

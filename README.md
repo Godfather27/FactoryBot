@@ -10,7 +10,7 @@ Install dependencies with the following command:
 composer install
 ```
 
-## Testing
+### Testing
 
 To run the test suite run the following command:
 

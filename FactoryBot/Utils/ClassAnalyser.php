@@ -6,12 +6,14 @@ use ReflectionClass;
 
 class ClassAnalyser
 {
-    public static function getMethods($class) {
+    public static function getMethods($class)
+    {
         $reflectionClass = new ReflectionClass($class);
         return $reflectionClass->getMethods();
     }
 
-    public static function getSetableProperties($class) {
+    public static function getSetableProperties($class)
+    {
         $methods = self::getMethods($class);
         $setableProperties = [];
         foreach ($methods as $method) {
@@ -22,7 +24,8 @@ class ClassAnalyser
         return $setableProperties;
     }
 
-    public static function hasSetter($class, $propertyName) {
+    public static function hasSetter($class, $propertyName)
+    {
         return method_exists($class, self::getSetterFromPropertyName($propertyName));
     }
 

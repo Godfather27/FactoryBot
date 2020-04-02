@@ -14,32 +14,37 @@ class Factory
 
     /**
      * class which gets constructed by this factory
+     *
      * @var string
      */
     private $class;
 
     /**
      * properties which will be hydrated if not overwritten on build
+     *
      * @var array
      */
     private $defaultProperties;
 
     /**
      * the currently created instance of the registred modl
+     *
      * @var object
      */
     private $classInstance;
 
     /**
      * the current sequence number
+     *
      * @var int
      */
     private $sequence = 0;
 
     /**
      * Factory constructor
-     * @param string $class - name of the model class
-     * @param array $properties - default properties for the model hydration
+     *
+     * @param  string $class      - name of the model class
+     * @param  array  $properties - default properties for the model hydration
      * @return void
      * @throws InvalidArgumentException
      */
@@ -53,8 +58,9 @@ class Factory
 
     /**
      * creates an instance of the specified model and hydrates it with the specified values
-     * @param array $overrides - model properties which should be overwritten
-     * @param string $buildStrategy wether the object should be saved, or not
+     *
+     * @param  array  $overrides     - model properties which should be overwritten
+     * @param  string $buildStrategy wether the object should be saved, or not
      * @return object - instance of the specified model
      * @throws InvalidArgumentException
      */
@@ -70,7 +76,8 @@ class Factory
 
     /**
      * builds and saves an instance of the specified model
-     * @param array $overrides - model properties which should be overwritten
+     *
+     * @param  array $overrides - model properties which should be overwritten
      * @return object - instance of the specified model
      * @throws InvalidArgumentException
      */
@@ -83,7 +90,8 @@ class Factory
 
     /**
      * extend existing factory with new default properties
-     * @param array $properties - default properties
+     *
+     * @param  array $properties - default properties
      * @return Factory
      */
     public function extend($properties = [])
@@ -94,6 +102,7 @@ class Factory
 
     /**
      * increments the sequence and returns the new sequence number
+     *
      * @return int
      */
     public function getNextSequenceValue()

@@ -2,6 +2,8 @@
 
 This is inspired by thoughtbot's ruby [FactoryBot](https://github.com/thoughtbot/factory_bot).
 
+FactoryBot is a fixtures replacement with a straightforward definition syntax, support for multiple build strategies (saved instances, unsaved instances), and support for multiple factories for the same class (user, admin_user, and so on), including factory inheritance.
+
 ## Configure your test suite
 
 ### PHPUnit

@@ -4,19 +4,38 @@ This is inspired by thoughtbot's ruby [factory_bot](https://github.com/thoughtbo
 
 FactoryBot is a fixtures replacement with a straightforward definition syntax, support for multiple build strategies (saved instances, unsaved instances), and support for multiple factories for the same class (user, admin_user, and so on), including factory inheritance.
 
+## Installation
+
+<TODO: add composer installation guide>
+
 ## Configure your test suite
 
 ### PHPUnit
 
 use `FactoryBot\FactoryBot` in your bootstrap `setup.php` file.
 
-Define all Factories you want to use.
+Define all Factories you want to use in your setup file.
 
 `phpunit.xml`
 
 ```xml
 <?xml version="1.0" encoding="UTF-8" ?>
 <phpunit bootstrap="tests/setup.php">
+```
+
+`tests/setup.php`
+
+```php
+// setup other stuff
+
+use FactoryBot\FactoryBot;
+
+FactoryBot::define(
+    UserModel::class,
+    ["firstName" => "John", "lastName" => "Doe"]
+);
+
+// define more Factories
 ```
 
 ## Defining factories

@@ -26,10 +26,10 @@ Each factory has a name and a set of attributes. The name is used to guess the c
 ```php
 use FactoryBot\FactoryBot;
 
-FactoryBot::define(UserModel::class, [
-    "firstName" => "John",
-    "lastName" => "Doe"
-]);
+FactoryBot::define(
+    UserModel::class,
+    ["firstName" => "John", "lastName" => "Doe"]
+);
 ```
 
 It is also possible to explicitly specify the class:
@@ -37,10 +37,11 @@ It is also possible to explicitly specify the class:
 ```php
 use FactoryBot\FactoryBot;
 
-FactoryBot::define("Admin", [
-    "firstName" => "John",
-    "lastName" => "Doe"
-], ["class" => UserModel::class]);
+FactoryBot::define(
+    "Admin",
+    ["firstName" => "John", "lastName" => "Doe"],
+    ["class" => UserModel::class]
+);
 ```
 
 It is highly recommended that you have one factory for each class that provides the simplest set of attributes necessary to create an instance of that class. Other factories can be created through inheritance to cover common scenarios for each class.
@@ -65,9 +66,7 @@ No matter which strategy is used, it's possible to override the defined attribut
 
 ```php
 # Build a User instance and override the first_name property
-FactoryBot::build(UserModel::class, [
-    "firstName" => "Jane"
-]);
+FactoryBot::build(UserModel::class, ["firstName" => "Jane"]);
 ```
 
 ## Aliases
@@ -78,7 +77,8 @@ factory_bot allows you to define aliases to existing factories to make them easi
 FactoryBot::define(
     UserModel::class,
     ["firstName" => "Jane"],
-    ["aliases" => ["Author", "Commenter"]]);
+    ["aliases" => ["Author", "Commenter"]]
+);
 
 FactoryBot::define(
     PostModel:class,
@@ -128,16 +128,17 @@ You can easily create multiple factories for the same class without repeating co
 
 ```php
 # Define a basic user
-FactoryBot::define(UserModel::class, [
-    "firstName" => "Jane",
-    "lastName" => "Doe",
-    "role" => "user"
-]);
+FactoryBot::define(
+    UserModel::class,
+    [
+        "firstName" => "Jane",
+        "lastName" => "Doe",
+        "role" => "user"
+    ]
+);
 
 # Extend the User Model as an Admin Factory
-FactoryBot::extend("Admin", UserModel::class, [
-    "role" => "admin"
-]);
+FactoryBot::extend("Admin", UserModel::class, ["role" => "admin"]);
 ```
 
 As mentioned above, it's good practice to define a basic factory for each class with only the attributes required to create it. Then, create more specific factories that inherit from this basic parent. Factory definitions are still code, so keep them DRY.
@@ -162,9 +163,7 @@ Relations default to using the same build strategy as their parent object:
 ```php
 FactoryBot::define(
     PostModel:class,
-    [
-        "author" => FatoryBot::relation("Author")
-    ]
+    ["author" => FatoryBot::relation("Author")]
 );
 
 $post = FactoryBot::create(PostModel:class);
@@ -181,9 +180,7 @@ To generate has many relationships you can use the relations method:
 ```php
 FactoryBot::define(
     UserModel::class,
-    [
-        "posts" => FatoryBot::relations(PostModel::class, 2)
-    ]
+    ["posts" => FatoryBot::relations(PostModel::class, 2)]
 );
 
 $user = FactoryBot::build(UserModel::class);
@@ -218,19 +215,20 @@ Unique values in a specific format (for example, e-mail addresses) can be genera
 The default implementation will generate a sequence of numbers, like the classic auto increment in SQL.
 
 ```php
-FactoryBot::define(UserModel::class, [
-    "id" => FactoryBot::sequence()
-]);
+FactoryBot::define(UserModel::class, ["id" => FactoryBot::sequence()]);
 ```
 
 To implement your own sequence method pass a method which generates a unique sequence value per call.
 
 ```php
-FactoryBot::define(UserModel::class, [
-    "email" => FactoryBot::sequence(function($num, $model) {
-        return "user" . $num . "@has-to-be.com";
-    })
-]);
+FactoryBot::define(
+    UserModel::class,
+    [
+        "email" => FactoryBot::sequence(function($num, $model) {
+            return "user" . $num . "@has-to-be.com";
+        })
+    ]
+);
 
 $user = FactoryBot::build(UserModel::class);
 $user->getEmail() # > "user1@has-to-be.com"
@@ -248,10 +246,14 @@ use Faker\Factory;
 use FactoryBot\FactoryBot;
 
 $faker = Factory::create('at_AT');
-FactoryBot::define(UserModel::class, [
-    "name" => "Jane Doe",
-    "street" => function () use($faker) { return $faker->streentName(); }, # local variables have to be injected using use
-]);
+FactoryBot::define(
+    UserModel::class,
+    [
+        "name" => "Jane Doe",
+        # local variables have to be injected using use
+        "street" => function () use($faker) { return $faker->streentName(); },
+    ]
+);
 ```
 
 using an instance variable:
@@ -274,10 +276,14 @@ class FactorySetup
 
     public function setUpUserFactory()
     {
-        FactoryBot::define(UserModel::class, [
-            "name" => "Jane Doe",
-            "street" => function () { return $this->faker->streentName(); }, # instance variables can be accessed without use
-        ]);
+        FactoryBot::define(
+            UserModel::class,
+            [
+                "name" => "Jane Doe",
+                # instance variables can be accessed without use
+                "street" => function () { return $this->faker->streentName(); },
+            ]
+        );
     }
 }
 ```

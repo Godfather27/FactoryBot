@@ -119,8 +119,8 @@ FactoryBot::define(
 
 ## Dependent Attributes
 
-Attributes can be based on the values of other attributes using the closure definition style.
-The closure gets passed in the partially hydrated model.
+Attributes can be based on the values of other attributes using the callable definition style.
+The callable gets passed in the partially hydrated model.
 The model gets hydrated with the specified params in order, so putting the email last enables us to access `firstName` and `lastName`.
 
 ```php
@@ -256,7 +256,7 @@ $user->getEmail() # > "user1@has-to-be.com"
 
 ## using FactoryBot with php faker
 
-Faker methods should always be called inside Closure functions. This way the faker method will be called on building.
+Faker methods should be wrapped by a callable. This way the faker method will be called during the build process.
 Otherwise the faker method will be called on definition and all instances will have the same value.
 
 using a local instance of faker:
@@ -270,7 +270,7 @@ FactoryBot::define(
     [
         "name" => "Jane Doe",
         # local variables have to be injected using use
-        "street" => function () use($faker) { return $faker->streentName(); },
+        "street" => function () use ($faker) { return $faker->streentName(); },
     ]
 );
 ```

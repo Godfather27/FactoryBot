@@ -8,6 +8,10 @@ use FactoryBot\Tests\TestModels\CarModel;
 use FactoryBot\Tests\TestModels\UserModel;
 use FactoryBot\Tests\TestModels\AccountModel;
 
+/**
+ * BDD Test class for FactoryBot
+ * @package FactoryBot\Tests
+ */
 class FactoryBotTest extends TestCase
 {
     protected function setUp()
@@ -84,7 +88,7 @@ class FactoryBotTest extends TestCase
         self::assertEquals($expectedLastName, $user->getLastName(), "should build with overwritten last name");
     }
 
-    public function testSetsOverridesCanBeClosure()
+    public function testSetsOverridesCanBeCallable()
     {
         $expectedFirstName = "test first name";
         $expectedLastName = "test last name";
@@ -204,7 +208,7 @@ class FactoryBotTest extends TestCase
         self::assertEquals($expectedId2, $admin->getId(), "should build with auto sequence id");
     }
 
-    public function testSetsDefaultClosureValues()
+    public function testSetsDefaultCallableValues()
     {
         $expectedFirstName = "test first name";
         $expectedLastName = "test last name";

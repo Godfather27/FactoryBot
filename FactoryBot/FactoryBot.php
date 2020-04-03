@@ -2,11 +2,18 @@
 
 namespace FactoryBot;
 
-use Closure;
 use FactoryBot\Core\Factory;
 use FactoryBot\Core\Repository;
 use FactoryBot\Exceptions\InvalidArgumentException;
 
+/**
+ * API Entrypoint
+ *
+ * FactoryBot is a fixtures replacement with a straightforward definition syntax, support for multiple build strategies
+ * (saved instances, unsaved instances),
+ * and support for multiple factories for the same class (user, admin_user, and so on), including Factory inheritance.
+ * @package FactoryBot
+ */
 class FactoryBot
 {
     /**
@@ -15,6 +22,7 @@ class FactoryBot
      * @var boolean
      */
     public static $warnings = false;
+
     /**
      * constructor disabled
      * no instance allowed
@@ -26,12 +34,11 @@ class FactoryBot
     }
 
     /**
-     * setup method for factories.
-     * Factories are registered in the global repository.
+     * Define Factory and register it in the Repository.
      *
-     * @param  string $name
-     * @param  array  $properties
-     * @param  array  $options    ["class" => specify class, "aliases" => register factory with additional names]
+     * @param  string $name       - name of the Factory
+     * @param  array  $properties - default properties for the Factory
+     * @param  array  $options    - ["class" => specify class, "aliases" => register Factory with additional names]
      * @return void
      */
     public static function define(
@@ -52,12 +59,12 @@ class FactoryBot
     }
 
     /**
-     * extends an existing factory with more specific default params
+     * Extend an existing Factory with more specific default params.
      *
-     * @param  string $name          - name of the factory
-     * @param  string $parentFactory - name of the factory, which will be inherited from
+     * @param  string $name          - name of the Factory
+     * @param  string $parentFactory - name of the Factory, which will be inherited from
      * @param  array  $properties    - default properties
-     * @param  array  $options       - ["aliases" => register factory with additional names]
+     * @param  array  $options       - ["aliases" => register Factory with additional names]
      * @return void
      */
     public static function extend(
@@ -77,11 +84,11 @@ class FactoryBot
     }
 
     /**
-     * build the specified model without saving it to the database.
+     * Build the specified model without saving it to the database.
      *
-     * @param  string $name      - name of the factory
+     * @param  string $name      - name of the Factory
      * @param  array  $overrides - model properties which should be overwritten
-     * @return object - returns an instance of the defined model
+     * @return object            - returns an instance of the defined model
      * @throws InvalidArgumentException - throws when passed params are invalid
      */
     public static function build($name, $overrides = [])
@@ -92,11 +99,11 @@ class FactoryBot
     }
 
     /**
-     * creates the specified model and saves it to the database.
+     * Create the specified model and save it to the database.
      *
-     * @param  string $name      - name of the factory
+     * @param  string $name      - name of the Factory
      * @param  array  $overrides - model properties which should be overwritten
-     * @return object - returns an instance of the defined model
+     * @return object            - returns an instance of the defined model
      * @throws InvalidArgumentException - throws when passed params are invalid
      */
     public static function create($name, $overrides = [])
@@ -107,15 +114,15 @@ class FactoryBot
     }
 
     /**
-     * define a 1:1 or n:1 relation in the Factory definition
+     * Define an 1:1 or n:1 relation.
      *
      * @param  string $name      - provide the name of the Factory which should be used
      * @param  array  $overrides - model properties which should be overwirtten
-     * @return Closure - closure function for related model
+     * @return callable          - returns relation generator function for related model
      */
     public static function relation($name, $overrides = [])
     {
-        // gets called by Factory->build/create($model, $buildStrategy)
+        // gets called by Factory->hydrateClassInstance($model, $buildStrategy)
         return function ($model, $buildStrategy) use ($name, $overrides) {
             $factory = Repository::findFactory($name);
             $classInstance = $factory->$buildStrategy($overrides);
@@ -124,16 +131,16 @@ class FactoryBot
     }
 
     /**
-     * define a 1:n or n:m relation in the Factory definition
+     * Define a 1:n or n:m relation.
      *
      * @param  string $name          - provide the name of the Factory which should be used
      * @param  int    $defaultAmount - defines how many instances should be generated
      * @param  array  $overrides     - model properties which should be overwirtten
-     * @return Closure - closure function for related model
+     * @return array                 - returns array of relation generator functions for related model
      */
     public static function relations($name, $defaultAmount = 1, $overrides = [])
     {
-        // gets called by Factory->build/create($model, $buildStrategy)
+        // gets called by Factory->hydrateClassInstance($model, $buildStrategy)
         $relations = [];
         for ($i = 0; $i < $defaultAmount; $i++) {
             $relations[] = self::relation($name, $overrides);
@@ -142,26 +149,28 @@ class FactoryBot
     }
 
     /**
-     * create a autoincrement id or provide a Closure to generate a sequence
+     * Create an autoincrement id or provide a callable to generate a sequence.
      *
-     * @param  Closure|null $closure - function that generates unique values
-     * @return Closure - value generator function for the Factory
+     * @param  callable|null $callable - callable that returns unique values
+     * @return callable                - value generator function for the Factory
      */
-    public static function sequence($closure = null)
+    public static function sequence($callable = null)
     {
-        if (is_callable($closure)) {
-            return function ($model, $buildStrategy) use ($closure) {
+        if (is_callable($callable)) {
+            // gets called by Factory->hydrateClassInstance($model, $buildStrategy)
+            return function ($model, $buildStrategy) use ($callable) {
                 $nextSequenceValue = Repository::findFactory(get_class($model))->getNextSequenceValue();
-                return $closure($nextSequenceValue, $model, $buildStrategy);
+                return $callable($nextSequenceValue, $model, $buildStrategy);
             };
         }
+        // gets called by Factory->hydrateClassInstance($model, $buildStrategy)
         return function ($model) {
             return Repository::findFactory(get_class($model))->getNextSequenceValue();
         };
     }
 
     /**
-     * unregister all Factories
+     * Remove all registered Factories.
      *
      * @return void
      */

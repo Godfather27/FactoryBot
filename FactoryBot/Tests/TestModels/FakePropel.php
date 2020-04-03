@@ -4,8 +4,9 @@ namespace FactoryBot\Tests\TestModels;
 
 /**
  * this class fakes Propel ORM integration
+ * @package FactoryBot\Tests\TestModels
  */
-class FakeORM
+class FakePropel
 {
     private $new = true;
 

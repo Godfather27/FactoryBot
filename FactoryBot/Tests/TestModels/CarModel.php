@@ -2,7 +2,11 @@
 
 namespace FactoryBot\Tests\TestModels;
 
-class CarModel extends FakeORM
+/**
+ * used to test 1:n relations
+ * @package FactoryBot\Tests\TestModels
+ */
+class CarModel extends FakePropel
 {
     private $id;
     private $name;

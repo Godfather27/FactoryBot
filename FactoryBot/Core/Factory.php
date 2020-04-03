@@ -7,13 +7,17 @@ use FactoryBot\Utils\Logger;
 use FactoryBot\Utils\ClassAnalyser;
 use FactoryBot\Exceptions\InvalidArgumentException;
 
+/**
+ * Factory class builds hydrates instances of specified models
+ * @package FactoryBot\Core
+ */
 class Factory
 {
     const BUILD_STRATEGY_BUILD = "build";
     const BUILD_STRATEGY_CREATE = "create";
 
     /**
-     * class which gets constructed by this factory
+     * class name used to construct a model by this Factory
      *
      * @var string
      */
@@ -27,7 +31,7 @@ class Factory
     private $defaultProperties;
 
     /**
-     * the currently created instance of the registred modl
+     * the currently created instance of the registered model
      *
      * @var object
      */
@@ -41,7 +45,7 @@ class Factory
     private $sequence = 0;
 
     /**
-     * Factory constructor
+     * Validate properties and save required params.
      *
      * @param  string $class      - name of the model class
      * @param  array  $properties - default properties for the model hydration
@@ -53,15 +57,15 @@ class Factory
         $this->class = $class;
         $this->validateDefaultProperties($properties);
         $this->defaultProperties = $properties;
-        $this->warnNotSetProperties();
+        $this->logNotSetProperties();
     }
 
     /**
-     * creates an instance of the specified model and hydrates it with the specified values
+     * Create an instance of the specified model and hydrate it with the specified values.
      *
      * @param  array  $overrides     - model properties which should be overwritten
-     * @param  string $buildStrategy wether the object should be saved, or not
-     * @return object - instance of the specified model
+     * @param  string $buildStrategy - wether the object should be saved, or not
+     * @return object                - instance of the specified model
      * @throws InvalidArgumentException
      */
     public function build($overrides = [], $buildStrategy = self::BUILD_STRATEGY_BUILD)
@@ -75,10 +79,10 @@ class Factory
     }
 
     /**
-     * builds and saves an instance of the specified model
+     * Build and save an instance of the specified model.
      *
      * @param  array $overrides - model properties which should be overwritten
-     * @return object - instance of the specified model
+     * @return object           - instance of the specified model
      * @throws InvalidArgumentException
      */
     public function create($overrides = [])
@@ -89,7 +93,7 @@ class Factory
     }
 
     /**
-     * extend existing factory with new default properties
+     * Extend existing Factory with more specific properties.
      *
      * @param  array $properties - default properties
      * @return Factory
@@ -101,7 +105,7 @@ class Factory
     }
 
     /**
-     * increments the sequence and returns the new sequence number
+     * Increment the sequence and return the new sequence number.
      *
      * @return int
      */
@@ -157,7 +161,7 @@ class Factory
         }
     }
 
-    private function warnNotSetProperties()
+    private function logNotSetProperties()
     {
         if (!FactoryBot::$warnings) {
             return;

@@ -2,6 +2,10 @@
 
 namespace FactoryBot\Tests\TestModels;
 
+/**
+ * used to test models which don't implement ORM logic
+ * @package FactoryBot\Tests\TestModels
+ */
 class NoORMModel
 {
     private $id;

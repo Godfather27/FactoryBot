@@ -2,7 +2,11 @@
 
 namespace FactoryBot\Tests\TestModels;
 
-class UserModel extends FakeORM
+/**
+ * model to test default behaviour of FactoryBot
+ * @package FactoryBot\Tests\TestModels
+ */
+class UserModel extends FakePropel
 {
     private $id;
     private $firstName;

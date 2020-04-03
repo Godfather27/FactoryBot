@@ -3,7 +3,12 @@
 namespace FactoryBot\Core;
 
 use FactoryBot\Exceptions\Exception;
+use FactoryBot\Core\Factory;
 
+/**
+ * repository for defined Factories
+ * @package FactoryBot\Core
+ */
 class Repository
 {
     /**
@@ -14,10 +19,10 @@ class Repository
     private static $factories = [];
 
     /**
-     * register a new factory instance
+     * Register a new Factory instance.
      *
-     * @param  string $name    - acessor name of factory
-     * @param  mixed  $factory
+     * @param  string  $name    - acessor name of Factory
+     * @param  Factory $factory - Factory instance to be saved
      * @return void
      */
     public static function registerFactory($name, $factory)
@@ -26,9 +31,9 @@ class Repository
     }
 
     /**
-     * gets the factory by name
+     * Get a registered Factory by name.
      *
-     * @param  string $name - name of the factory
+     * @param  string $name - name of the Factory
      * @return Factory
      */
     public static function findFactory($name)
@@ -40,7 +45,7 @@ class Repository
     }
 
     /**
-     * deletes all defined Factories
+     * Delete all defined Factories.
      *
      * @return void
      */

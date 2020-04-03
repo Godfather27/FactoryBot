@@ -50,11 +50,9 @@ class FactoryBotTest extends TestCase
 
     public function testFailsOnNotExistingClass()
     {
-        $expected = "NotexistingClass";
-
         $this->setExpectedException("InvalidArgumentException");
 
-        FactoryBot::define($expected);
+        FactoryBot::define("NotexistingClass");
     }
 
     public function testAllowsAliases()
@@ -65,9 +63,8 @@ class FactoryBotTest extends TestCase
 
         FactoryBot::define($expectedClass, [], ["aliases" => [$alias1, $alias2]]);
 
-        self::assertInstanceOf($expectedClass, FactoryBot::build($expectedClass), "should build class from name");
-        self::assertInstanceOf($expectedClass, FactoryBot::build($alias1), "should build from alias");
-        self::assertInstanceOf($expectedClass, FactoryBot::build($alias2), "should build from alias");
+        self::assertInstanceOf($expectedClass, FactoryBot::build($alias1), "should build correct class from alias");
+        self::assertInstanceOf($expectedClass, FactoryBot::build($alias2), "should build correct class from alias");
     }
 
     public function testSetsOverrides()
@@ -88,24 +85,25 @@ class FactoryBotTest extends TestCase
         self::assertEquals($expectedLastName, $user->getLastName(), "should build with overwritten last name");
     }
 
-    public function testSetsOverridesCanBeCallable()
+    public function testSetsCallableOverrides()
     {
-        $expectedFirstName = "test first name";
         $expectedLastName = "test last name";
         FactoryBot::define(UserModel::class);
 
         $user = FactoryBot::build(
             UserModel::class,
             [
-                "firstName" => $expectedFirstName,
                 "lastName" => function () use ($expectedLastName) {
                     return $expectedLastName;
                 }
             ]
         );
 
-        self::assertEquals($expectedFirstName, $user->getFirstName(), "should build with overwritten first name");
-        self::assertEquals($expectedLastName, $user->getLastName(), "should build with overwritten last name");
+        self::assertEquals(
+            $expectedLastName,
+            $user->getLastName(),
+            "should build with overwritten last name from callable"
+        );
     }
 
     public function testRejectsMalformatedOverrides()
@@ -143,8 +141,8 @@ class FactoryBotTest extends TestCase
 
         $user = FactoryBot::build(UserModel::class);
 
-        self::assertEquals($expectedFirstName, $user->getFirstName(), "should build with overwritten first name");
-        self::assertEquals($expectedLastName, $user->getLastName(), "should build with overwritten last name");
+        self::assertEquals($expectedFirstName, $user->getFirstName(), "should build defined first name");
+        self::assertEquals($expectedLastName, $user->getLastName(), "should build defined last name");
     }
 
     public function testSetsDefaultSequenceValues()
@@ -183,32 +181,31 @@ class FactoryBotTest extends TestCase
         $user1 = FactoryBot::build(UserModel::class);
         $user2 = FactoryBot::build(UserModel::class);
 
-        self::assertEquals($expectedId1, $user1->getfirstName(), "should build with overwritten first name");
-        self::assertEquals($expectedId2, $user2->getfirstName(), "should build with overwritten first name");
+        self::assertEquals($expectedId1, $user1->getfirstName(), "should build custom sequence first name");
+        self::assertEquals($expectedId2, $user2->getfirstName(), "should build custom sequence first name");
     }
 
     public function testSetsDefaultSequenceValuesWithAliases()
     {
         $expectedId1 = 1;
         $expectedId2 = 2;
+        $expectedId3 = 3;
         FactoryBot::define(
             UserModel::class,
-            [
-                "id" => FactoryBot::sequence()
-            ],
-            [
-                "aliases" => ["Admin"]
-            ]
+            ["id" => FactoryBot::sequence()],
+            ["aliases" => ["Admin"]]
         );
 
-        $user = FactoryBot::build(UserModel::class);
+        $user1 = FactoryBot::build(UserModel::class);
         $admin = FactoryBot::build("Admin");
+        $user2 = FactoryBot::build(UserModel::class);
 
-        self::assertEquals($expectedId1, $user->getId(), "should build with auto sequence id");
-        self::assertEquals($expectedId2, $admin->getId(), "should build with auto sequence id");
+        self::assertEquals($expectedId1, $user1->getId(), "should build with auto sequence id");
+        self::assertEquals($expectedId2, $admin->getId(), "should build with auto sequence id incremented");
+        self::assertEquals($expectedId3, $user2->getId(), "should build with auto sequence id incremented");
     }
 
-    public function testSetsDefaultCallableValues()
+    public function testSetsCallableDefaultValues()
     {
         $expectedFirstName = "test first name";
         $expectedLastName = "test last name";
@@ -224,8 +221,8 @@ class FactoryBotTest extends TestCase
 
         $user = FactoryBot::build(UserModel::class);
 
-        self::assertEquals($expectedFirstName, $user->getFirstName(), "should build with overwritten first name");
-        self::assertEquals($expectedLastName, $user->getLastName(), "should build with overwritten last name");
+        self::assertEquals($expectedFirstName, $user->getFirstName(), "should build defined first name");
+        self::assertEquals($expectedLastName, $user->getLastName(), "should build last name from callable");
     }
 
     public function testSetsDependendValues()
@@ -246,9 +243,9 @@ class FactoryBotTest extends TestCase
 
         $user = FactoryBot::build(UserModel::class);
 
-        self::assertEquals($expectedFirstName, $user->getFirstName(), "should build with overwritten first name");
-        self::assertEquals($expectedLastName, $user->getLastName(), "should build with overwritten last name");
-        self::assertEquals($expectedEmail, $user->getEmail(), "should build with overwritten email");
+        self::assertEquals($expectedFirstName, $user->getFirstName(), "should build defined first name");
+        self::assertEquals($expectedLastName, $user->getLastName(), "should build defined last name");
+        self::assertEquals($expectedEmail, $user->getEmail(), "should build email dependend on first and last name");
     }
 
     public function testSetsDefaultValuesAndOverrides()
@@ -270,7 +267,7 @@ class FactoryBotTest extends TestCase
             ]
         );
 
-        self::assertEquals($expectedFirstName, $user->getFirstName(), "should build with overwritten first name");
+        self::assertEquals($expectedFirstName, $user->getFirstName(), "should build with defined first name");
         self::assertEquals($expectedLastName, $user->getLastName(), "should build with overwritten last name");
     }
 
@@ -285,7 +282,7 @@ class FactoryBotTest extends TestCase
         FactoryBot::define(UserModel::class, "firstname");
     }
 
-    public function testRejectsMalformatedDefaultValues2()
+    public function testRejectsNotSettableDefaultValues()
     {
         $this->setExpectedException("InvalidArgumentException", "UserModel has no setter for `nickname`!");
 
@@ -298,16 +295,12 @@ class FactoryBotTest extends TestCase
         FactoryBot::define(
             AccountModel::class,
             [
-                "id" => 22,
                 "name" => $expectedName
             ]
         );
         FactoryBot::define(
             UserModel::class,
             [
-                "id" => 1,
-                "firstName" => "first name",
-                "lastName" => "last name",
                 "account" => FactoryBot::relation(AccountModel::class)
             ]
         );
@@ -323,9 +316,6 @@ class FactoryBotTest extends TestCase
         FactoryBot::define(
             UserModel::class,
             [
-                "id" => 1,
-                "firstName" => "first name",
-                "lastName" => "last name",
                 "subordinate" => FactoryBot::relation(
                     UserModel::class,
                     [
@@ -341,23 +331,19 @@ class FactoryBotTest extends TestCase
         self::assertEquals($expectedName, $user->getSubordinate()->getFirstName(), "should build nested model");
     }
 
-    public function testCreatesRelations()
+    public function testBuildsRelations()
     {
         $expectedName = "car name";
         $expectedCount = 2;
         FactoryBot::define(
             CarModel::class,
             [
-                "id" => 22,
                 "name" => $expectedName
             ]
         );
         FactoryBot::define(
             UserModel::class,
             [
-                "id" => 1,
-                "firstName" => "first name",
-                "lastName" => "last name",
                 "cars" => FactoryBot::relations(CarModel::class, 2)
             ]
         );
@@ -368,50 +354,22 @@ class FactoryBotTest extends TestCase
         self::assertEquals($expectedCount, count($user->getCars()), "should build 2 car models");
     }
 
-    public function testOverridesAcceptsModel()
+    public function testOverridesAcceptsModelInstance()
     {
         $expectedName = "new account name";
-        FactoryBot::define(
-            AccountModel::class,
-            [
-                "id" => 22,
-                "name" => "account name"
-            ]
-        );
-        FactoryBot::define(
-            UserModel::class,
-            [
-                "id" => 1,
-                "firstName" => "first name",
-                "lastName" => "last name",
-                "account" => FactoryBot::relation(AccountModel::class)
-            ]
-        );
-
+        FactoryBot::define(AccountModel::class, ["name" => "account name"]);
+        FactoryBot::define(UserModel::class, ["account" => FactoryBot::relation(AccountModel::class)]);
         $account = FactoryBot::build(AccountModel::class, ["name" => $expectedName]);
+
         $user = FactoryBot::build(UserModel::class, ["account" => $account]);
 
-        self::assertEquals($expectedName, $user->getAccount()->getName(), "should build nested model");
+        self::assertEquals($expectedName, $user->getAccount()->getName(), "should overwrite nested model");
     }
 
     public function testInheritsBuildStrategyBuildOnRelation()
     {
-        FactoryBot::define(
-            AccountModel::class,
-            [
-                "id" => 22,
-                "name" => "account name"
-            ]
-        );
-        FactoryBot::define(
-            UserModel::class,
-            [
-                "id" => 1,
-                "firstName" => "first name",
-                "lastName" => "last name",
-                "account" => FactoryBot::relation(AccountModel::class)
-            ]
-        );
+        FactoryBot::define(AccountModel::class);
+        FactoryBot::define(UserModel::class, ["account" => FactoryBot::relation(AccountModel::class)]);
 
         $user = FactoryBot::build(UserModel::class);
 
@@ -420,82 +378,38 @@ class FactoryBotTest extends TestCase
 
     public function testInheritsBuildStrategyCreateOnRelation()
     {
-        FactoryBot::define(
-            AccountModel::class,
-            [
-                "id" => 22,
-                "name" => "account name"
-            ]
-        );
-        FactoryBot::define(
-            UserModel::class,
-            [
-                "id" => 1,
-                "firstName" => "first name",
-                "lastName" => "last name",
-                "account" => FactoryBot::relation(AccountModel::class)
-            ]
-        );
+        FactoryBot::define(AccountModel::class);
+        FactoryBot::define(UserModel::class, ["account" => FactoryBot::relation(AccountModel::class)]);
 
         $user = FactoryBot::create(UserModel::class);
 
-        self::assertFalse($user->getAccount()->isNew(), "should build nested model");
+        self::assertFalse($user->getAccount()->isNew(), "should create nested model");
     }
 
     public function testInheritsBuildStrategyBuildOnRelations()
     {
-        $expectedName = "car name";
         $expectedCount = 2;
-        FactoryBot::define(
-            CarModel::class,
-            [
-                "id" => 22,
-                "name" => $expectedName
-            ]
-        );
-        FactoryBot::define(
-            UserModel::class,
-            [
-                "id" => 1,
-                "firstName" => "first name",
-                "lastName" => "last name",
-                "cars" => FactoryBot::relations(CarModel::class, 2)
-            ]
-        );
+        FactoryBot::define(CarModel::class);
+        FactoryBot::define(UserModel::class, ["cars" => FactoryBot::relations(CarModel::class, 2)]);
 
         $user = FactoryBot::build(UserModel::class);
 
         foreach ($user->getCars() as $car) {
             self::assertTrue($car->isNew(), "should build nested model");
         }
-        self::assertEquals($expectedCount, count($user->getCars()));
+        self::assertEquals($expectedCount, count($user->getCars()), "should have 2 relations");
     }
 
     public function testInheritsBuildStrategyCreateOnRelations()
     {
-        $expectedName = "car name";
         $expectedCount = 2;
-        FactoryBot::define(
-            CarModel::class,
-            [
-                "id" => 22,
-                "name" => $expectedName
-            ]
-        );
-        FactoryBot::define(
-            UserModel::class,
-            [
-                "id" => 1,
-                "firstName" => "first name",
-                "lastName" => "last name",
-                "cars" => FactoryBot::relations(CarModel::class, 2)
-            ]
-        );
+        FactoryBot::define(CarModel::class);
+        FactoryBot::define(UserModel::class, ["cars" => FactoryBot::relations(CarModel::class, 2)]);
 
         $user = FactoryBot::create(UserModel::class);
 
         foreach ($user->getCars() as $car) {
-            self::assertFalse($car->isNew(), "should build nested model");
+            self::assertFalse($car->isNew(), "should create nested model");
         }
         self::assertEquals($expectedCount, count($user->getCars()), "should have 2 relations");
     }

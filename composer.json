@@ -1,4 +1,21 @@
 {
+    "name": "has-to-be/factory-bot",
+    "type": "library",
+    "description": "Fixtures replacement with a straightforward definition syntax",
+    "keywords": ["factory_bot","fixture","factory","bot", "testing"],
+    "homepage": "https://has-to-be.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Sebastian Huber",
+            "email": "sebastian.huber@has-to-be.com",
+            "homepage": "https://twitter.com/SebCHuber",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0"
+    },
     "require-dev": {
         "phpunit/phpunit": "^5"
     },

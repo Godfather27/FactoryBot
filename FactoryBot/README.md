@@ -102,7 +102,7 @@ FactoryBot::define(
 );
 
 FactoryBot::define(
-    PostModel:class,
+    PostModel::class,
     [
         "title" => "lorem ipsum!",
         "body" => "lorem ipsum dolor sit amet",
@@ -111,7 +111,7 @@ FactoryBot::define(
 );
 
 FactoryBot::define(
-    CommentModel:class,
+    CommentModel::class,
     [
         "body" => "lorem ipsum dolor sit amet",
         "commenter" => FatoryBot::relation("Commenter")
@@ -170,7 +170,7 @@ It's possible to set up relations within factories. Use the relation method from
 
 ```php
 FactoryBot::define(
-    PostModel:class,
+    PostModel::class,
     [
         "title" => "lorem ipsum!",
         "body" => "lorem ipsum dolor sit amet",
@@ -183,15 +183,15 @@ Relations default to using the same build strategy as their parent object:
 
 ```php
 FactoryBot::define(
-    PostModel:class,
+    PostModel::class,
     ["author" => FatoryBot::relation("Author")]
 );
 
-$post = FactoryBot::create(PostModel:class);
+$post = FactoryBot::create(PostModel::class);
 $post->isNew();              # > false
 $post->getAuthor()->isNew(); # > false
 
-$post2 = FactoryBot::build(PostModel:class);
+$post2 = FactoryBot::build(PostModel::class);
 $post2->isNew();              # > true
 $post2->getAuthor()->isNew(); # > true
 ```

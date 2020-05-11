@@ -26,10 +26,14 @@
             "FactoryBot\\": "FactoryBot/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "FactoryBot\\Tests\\": "tests/"}
+    },
     "scripts": {
         "test": [
             "parallel-lint . --exclude vendor",
-            "phpunit FactoryBot/Tests"
+            "phpunit tests/"
         ]
     },
     "config": {

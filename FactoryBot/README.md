@@ -6,7 +6,9 @@ FactoryBot is a fixtures replacement with a straightforward definition syntax, s
 
 ## Installation
 
-<TODO: add composer installation guide>
+Install the latest version with
+
+        $ composer require has-to-be/FactoryBot
 
 ## Configure your test suite
 

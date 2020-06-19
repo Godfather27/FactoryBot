@@ -8,7 +8,7 @@ FactoryBot is a fixtures replacement with a straightforward definition syntax, s
 
 Install the latest version with
 
-        $ composer require has-to-be/FactoryBot
+        $ composer require factory-bot/factory-bot
 
 ## Configure your test suite
 
@@ -133,14 +133,14 @@ FactoryBot::define(
         "lastName" => "Doe",
         "email" => function ($model) {
             return strtolower(
-                $model->getfirstName() . "." . $model->getLastName() . "@has-to-be.com"
+                $model->getfirstName() . "." . $model->getLastName() . "@example.com"
             );
         }
     ]
 );
 
 FactoryBot::build(UserModel::class)->getEmail()
-# > "john.doe@has-to-be.com"
+# > "john.doe@example.com"
 ```
 
 ## Inheritance
@@ -246,13 +246,13 @@ FactoryBot::define(
     UserModel::class,
     [
         "email" => FactoryBot::sequence(function($num, $model) {
-            return "user" . $num . "@has-to-be.com";
+            return "user" . $num . "@example.com";
         })
     ]
 );
 
 $user = FactoryBot::build(UserModel::class);
-$user->getEmail() # > "user1@has-to-be.com"
+$user->getEmail() # > "user1@example.com"
 ```
 
 

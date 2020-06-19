@@ -229,14 +229,14 @@ class FactoryBotTest extends TestCase
     {
         $expectedFirstName = "Jane";
         $expectedLastName = "Doe";
-        $expectedEmail = "Jane.Doe@has-to-be.com";
+        $expectedEmail = "Jane.Doe@example.com";
         FactoryBot::define(
             UserModel::class,
             [
                 "firstName" => $expectedFirstName,
                 "lastName" => $expectedLastName,
                 "email" => function ($model) {
-                    return $model->getfirstName().".".$model->getLastName()."@has-to-be.com";
+                    return $model->getfirstName() . "." . $model->getLastName() . "@example.com";
                 }
             ]
         );

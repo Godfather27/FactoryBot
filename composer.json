@@ -1,14 +1,14 @@
 {
-    "name": "has-to-be/factory-bot",
+    "name": "factory-bot/factory-bot",
     "type": "library",
     "description": "Fixtures replacement with a straightforward definition syntax",
     "keywords": ["factory_bot","fixture","factory","bot", "testing"],
-    "homepage": "https://has-to-be.com",
+    "homepage": "https://github.com/Godfather27/FactoryBot",
     "license": "BSD-3",
     "authors": [
         {
             "name": "Sebastian Huber",
-            "email": "sebastian.huber@has-to-be.com",
+            "email": "sebastian_christoph_huber@yahoo.de",
             "homepage": "https://twitter.com/SebCHuber",
             "role": "Developer"
         }

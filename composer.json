@@ -26,6 +26,9 @@
             "FactoryBot\\": "FactoryBot/"
         }
     },
+    "suggest": {
+        "fzaninotto/faker": "For generating fake data in entity definitions"
+    },
     "autoload-dev": {
         "psr-4": {
             "FactoryBot\\Tests\\": "tests/"}

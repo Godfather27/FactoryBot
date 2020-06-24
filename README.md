@@ -275,11 +275,13 @@ On the definition of a Factory you can register a lifecycle hook, which only get
 Example:
 
 ```php
+$logger = new Logger();
+
 FactoryBot::define(
     UserModel::class,
     ["name" => "Jane Doe"],
     ["hooks" => [
-        FactoryBot::hook("afterCreate", function ($instance) {
+        FactoryBot::hook("afterCreate", function ($instance) use ($logger) {
             $logger->debug("created an UserModel instance: $instance->getName()");
         })
     ]]
@@ -293,7 +295,9 @@ $user = FactoryBot::build(UserModel::class); # logger output > "created an UserM
 A Hook can also be registered for all Factories.
 
 ```php
-FactoryBot::registerGlobalHook("afterCreate", function ($instance) {
+$logger = new Logger();
+
+FactoryBot::registerGlobalHook("afterCreate", function ($instance) use ($logger) {
     $class = get_class($instance);
     $logger->debug("created an $class instance");
 });

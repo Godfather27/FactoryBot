@@ -36,7 +36,7 @@ class Hook
      */
     public function __construct($lifecycleStage, $callback)
     {
-        $this->setName($lifecycleStage);
+        $this->setLifecycleStage($lifecycleStage);
         $this->setCallback($callback);
     }
 
@@ -50,12 +50,12 @@ class Hook
         call_user_func($this->callback, $instance);
     }
 
-    private function setName($name)
+    private function setLifecycleStage($lifecycleStage)
     {
-        if ($this->isLifecycleStage($name)) {
-            throw new InvalidArgumentException("Invalid Hook: lifecycle stage `$name` does not exist.");
+        if ($this->isLifecycleStage($lifecycleStage)) {
+            throw new InvalidArgumentException("Invalid Hook: lifecycle stage `$lifecycleStage` does not exist.");
         }
-        $this->name = $name;
+        $this->lifecycleStage = $lifecycleStage;
     }
 
     private function setCallback($callback)

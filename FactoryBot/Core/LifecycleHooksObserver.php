@@ -34,7 +34,7 @@ class LifecycleHooksObserver
     public function notify($lifecycleStageName, $instance = null)
     {
         foreach ($this->getHooks() as $hook) {
-            if ($hook->name === $lifecycleStageName) {
+            if ($hook->lifecycleStage === $lifecycleStageName) {
                 $hook->run($instance);
             }
         }

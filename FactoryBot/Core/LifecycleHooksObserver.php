@@ -70,6 +70,11 @@ class LifecycleHooksObserver
         $this->factoryHooks = $factoryHooks;
     }
 
+    /**
+     * gets all hooks relevant for a specific Factory.
+     * global and factory hooks
+     * @return array array with hooks
+     */
     private function getHooks()
     {
         return array_merge(self::$globalHooks, $this->factoryHooks);

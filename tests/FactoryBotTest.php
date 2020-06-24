@@ -459,9 +459,9 @@ class FactoryBotTest extends TestCase
         FactoryBot::define(UserModel::class);
         FactoryBot::build(UserModel::class);
 
-        self::assertTrue($spy1);
-        self::assertTrue($spy2);
-        self::assertFalse($spy3);
+        self::assertTrue($spy1, "should call global `before` hook");
+        self::assertTrue($spy2, "should call global `afterBuild` hook");
+        self::assertFalse($spy3, "should not call global `afterCreate` hook");
     }
 
     public function testCallsFactoryLifecycleHook()
@@ -484,8 +484,8 @@ class FactoryBotTest extends TestCase
 
         FactoryBot::build(UserModel::class);
 
-        $this->assertFalse($spy1, "should not call Factories afterCreate hook");
-        $this->assertTrue($spy2, "should call Factories before Hook");
+        $this->assertFalse($spy1, "should not call Factories `afterCreate` hook");
+        $this->assertTrue($spy2, "should call Factories `before` Hook");
     }
 
     public function testCallsMultipleLifecycleHooksForSameStage()
@@ -516,9 +516,9 @@ class FactoryBotTest extends TestCase
 
         FactoryBot::build(UserModel::class);
 
-        $this->assertTrue($spy1, "should call 1st global before Hook");
-        $this->assertTrue($spy2, "should call 2nd global before Hook");
-        $this->assertTrue($spy3, "should call 1st Factories before Hook");
-        $this->assertTrue($spy4, "should call 2nd Factories before Hook");
+        $this->assertTrue($spy1, "should call 1st global `before` Hook");
+        $this->assertTrue($spy2, "should call 2nd global `before` Hook");
+        $this->assertTrue($spy3, "should call 1st Factories `before` Hook");
+        $this->assertTrue($spy4, "should call 2nd Factories `before` Hook");
     }
 }

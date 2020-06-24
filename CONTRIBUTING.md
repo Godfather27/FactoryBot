@@ -30,7 +30,15 @@ composer install
 
 ## Coding Convention
 
-We enforce PSR-2 coding conventions
+We enforce PSR-12 coding conventions
+
+all public properties and functions must have documentation
+
+all private properties and functions should have documentation
+
+new features must be documented in the README
+
+all test assertions must have messages
 
 ## Testing
 

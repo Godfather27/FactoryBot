@@ -432,4 +432,93 @@ class FactoryBotTest extends TestCase
         self::assertEquals($expectedFirstName, $admin->getFirstName(), "should build firstName of parent");
         self::assertEquals($expectedRole, $admin->getRole(), "should build role");
     }
+
+    public function testCallsglobalLifecycleHooks()
+    {
+        $stub1 = false;
+        $stub2 = false;
+        $stub3 = false;
+        FactoryBot::registerGlobalHook(
+            "before",
+            function () use (&$stub1) {
+                $stub1 = true;
+            }
+        );
+        FactoryBot::registerGlobalHook(
+            "afterBuild",
+            function () use (&$stub2) {
+                $stub2 = true;
+            }
+        );
+        FactoryBot::registerGlobalHook(
+            "afterCreate",
+            function () use (&$stub3) {
+                $stub3 = true;
+            }
+        );
+        FactoryBot::define(UserModel::class);
+        FactoryBot::build(UserModel::class);
+
+        self::assertTrue($stub1);
+        self::assertTrue($stub2);
+        self::assertFalse($stub3);
+    }
+
+    public function testCallsFactoryLifecycleHook()
+    {
+        $stub1 = false;
+        $stub2 = false;
+
+        FactoryBot::define(
+            UserModel::class,
+            [],
+            ["hooks" => [
+                FactoryBot::hook("afterCreate", function () use (&$stub1) {
+                    $stub1 = true;
+                }),
+                FactoryBot::hook("before", function () use (&$stub2) {
+                    $stub2 = true;
+                }),
+            ]]
+        );
+
+        FactoryBot::build(UserModel::class);
+
+        $this->assertFalse($stub1, "should not call Factories afterCreate hook");
+        $this->assertTrue($stub2, "should call Factories before Hook");
+    }
+
+    public function testCallsMultipleLifecycleHooksForSameStage()
+    {
+        $stub1 = false;
+        $stub2 = false;
+        $stub3 = false;
+        $stub4 = false;
+
+        FactoryBot::registerGlobalHook("before", function () use (&$stub1) {
+            $stub1 = true;
+        });
+        FactoryBot::registerGlobalHook("before", function () use (&$stub2) {
+            $stub2 = true;
+        });
+        FactoryBot::define(
+            UserModel::class,
+            [],
+            ["hooks" => [
+                FactoryBot::hook("before", function () use (&$stub3) {
+                    $stub3 = true;
+                }),
+                FactoryBot::hook("before", function () use (&$stub4) {
+                    $stub4 = true;
+                }),
+            ]]
+        );
+
+        FactoryBot::build(UserModel::class);
+
+        $this->assertTrue($stub1, "should call 1st global before Hook");
+        $this->assertTrue($stub2, "should call 2nd global before Hook");
+        $this->assertTrue($stub3, "should call 1st Factories before Hook");
+        $this->assertTrue($stub4, "should call 2nd Factories before Hook");
+    }
 }

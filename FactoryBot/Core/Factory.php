@@ -2,6 +2,7 @@
 
 namespace FactoryBot\Core;
 
+use FactoryBot\Core\LifecycleHooksObserver;
 use FactoryBot\FactoryBot;
 use FactoryBot\Utils\Logger;
 use FactoryBot\Utils\ClassAnalyser;
@@ -45,6 +46,12 @@ class Factory
     private $sequence = 0;
 
     /**
+     * lifecycle hooks registered on the factory
+     * @var array
+     */
+    public $hooks = [];
+
+    /**
      * Validate properties and save required params.
      *
      * @param  string $class      - name of the model class
@@ -52,12 +59,14 @@ class Factory
      * @return void
      * @throws InvalidArgumentException
      */
-    public function __construct($class, $properties = [])
+    public function __construct($class, $properties, $hooks)
     {
         $this->class = $class;
         $this->validateDefaultProperties($properties);
         $this->defaultProperties = $properties;
         $this->logNotSetProperties();
+        $this->hooks = $hooks;
+        $this->observer = new LifecycleHooksObserver($hooks);
     }
 
     /**
@@ -68,13 +77,13 @@ class Factory
      * @return object                - instance of the specified model
      * @throws InvalidArgumentException
      */
-    public function build($overrides = [], $buildStrategy = self::BUILD_STRATEGY_BUILD)
+    public function build($overrides)
     {
-        $this->validateOverrides($overrides);
-        $this->buildStrategy = $buildStrategy;
-        $this->classInstance = new $this->class();
-        $properties = array_merge($this->defaultProperties, $overrides);
-        $this->classInstance = $this->hydrateClassInstance($properties);
+        $this->observer->notify("before");
+        $this->observer->notify("beforeBuild");
+        $this->compile($overrides, self::BUILD_STRATEGY_BUILD);
+        $this->observer->notify("afterBuild", $this->classInstance);
+        $this->observer->notify("after", $this->classInstance);
         return $this->classInstance;
     }
 
@@ -85,10 +94,14 @@ class Factory
      * @return object           - instance of the specified model
      * @throws InvalidArgumentException
      */
-    public function create($overrides = [])
+    public function create($overrides)
     {
-        $this->classInstance = $this->build($overrides, self::BUILD_STRATEGY_CREATE);
+        $this->observer->notify("before");
+        $this->observer->notify("beforeCreate");
+        $this->compile($overrides, self::BUILD_STRATEGY_CREATE);
         $this->classInstance->save();
+        $this->observer->notify("afterCreate", $this->classInstance);
+        $this->observer->notify("after", $this->classInstance);
         return $this->classInstance;
     }
 
@@ -98,10 +111,11 @@ class Factory
      * @param  array $properties - default properties
      * @return Factory
      */
-    public function extend($properties = [])
+    public function extend($properties, $hooks)
     {
         $mergedProperties = array_merge($this->defaultProperties, $properties);
-        return new Factory($this->class, $mergedProperties);
+        $mergedHooks = array_merge($this->hooks, $hooks);
+        return new Factory($this->class, $mergedProperties, $mergedHooks);
     }
 
     /**
@@ -112,6 +126,15 @@ class Factory
     public function getNextSequenceValue()
     {
         return $this->sequence += 1;
+    }
+
+    private function compile($overrides, $buildStrategy)
+    {
+        $this->validateOverrides($overrides);
+        $this->buildStrategy = $buildStrategy;
+        $this->classInstance = new $this->class();
+        $properties = array_merge($this->defaultProperties, $overrides);
+        $this->classInstance = $this->hydrateClassInstance($properties);
     }
 
     private function hydrateClassInstance($properties)

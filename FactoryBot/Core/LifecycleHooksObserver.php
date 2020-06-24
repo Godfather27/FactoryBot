@@ -64,7 +64,7 @@ class LifecycleHooksObserver
     {
         foreach ($factoryHooks as $hook) {
             if (!$hook instanceof Hook) {
-                throw new InvalidArgumentException(sprintf("invalid Hook used in definition of Factory"));
+                throw new InvalidArgumentException("invalid Hook used in definition of Factory");
             }
         }
         $this->factoryHooks = $factoryHooks;

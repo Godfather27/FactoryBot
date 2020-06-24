@@ -49,7 +49,7 @@ class Factory
      * lifecycle hooks registered on the factory
      * @var array
      */
-    public $hooks = [];
+    private $hooks = [];
 
     /**
      * Validate properties and save required params.

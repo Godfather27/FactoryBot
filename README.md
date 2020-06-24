@@ -255,6 +255,59 @@ $user = FactoryBot::build(UserModel::class);
 $user->getEmail() # > "user1@example.com"
 ```
 
+## Lifecycle Hooks
+
+FactoryBot provides 6 different hooks to inject custom code.
+
+- `before` - called before building or creating an instance.
+- `after` - called after building or creating an instance.
+- `beforeCreate` - called before creating an instance.
+- `afterCreate` - called after creating an instance.
+- `beforeBuild` - called before building an instance.
+- `afterBuild` - called after building an instance.
+
+Factories can also define any number of the same kind of hook. These hooks will be executed in the order they are specified.
+
+### Hook per Factory
+
+On the definition of a Factory you can register a lifecycle hook, which only gets executed on the Factory where it is defined.
+
+Example:
+
+```php
+$logger = new Logger();
+
+FactoryBot::define(
+    UserModel::class,
+    ["name" => "Jane Doe"],
+    ["hooks" => [
+        FactoryBot::hook("afterCreate", function ($instance) use ($logger) {
+            $logger->debug("created an UserModel instance: $instance->getName()");
+        })
+    ]]
+);
+
+$user = FactoryBot::build(UserModel::class); # logger output > "created an UserModel instance: Jane Doe"
+```
+
+### global Hook
+
+A Hook can also be registered for all Factories.
+
+```php
+$logger = new Logger();
+
+FactoryBot::registerGlobalHook("afterCreate", function ($instance) use ($logger) {
+    $class = get_class($instance);
+    $logger->debug("created an $class instance");
+});
+
+FactoryBot::define(UserModel::class);
+FactoryBot::define(PostModel::class);
+
+$user = FactoryBot::build(UserModel::class); # logger output > "created an UserModel instance"
+$post = FactoryBot::build(PostModel::class); # logger output > "created an PostModel instance"
+```
 
 ## using FactoryBot with php faker
 

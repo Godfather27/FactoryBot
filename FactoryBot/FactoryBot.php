@@ -2,8 +2,10 @@
 
 namespace FactoryBot;
 
+use FactoryBot\Core\Hook;
 use FactoryBot\Core\Factory;
 use FactoryBot\Core\Repository;
+use FactoryBot\Core\LifecycleHooksObserver;
 use FactoryBot\Exceptions\InvalidArgumentException;
 
 /**
@@ -34,25 +36,54 @@ class FactoryBot
     }
 
     /**
+     * create a Hook which is triggered for all Factories
+     * @param string $lifecycleStage stage at which the hook gets fired
+     * @param callable $callback     callback which gets executed
+     * @return void
+     */
+    public static function registerGlobalHook($lifecycleStage, $callback)
+    {
+        $hook = new Hook($lifecycleStage, $callback);
+        LifecycleHooksObserver::registerHook($hook);
+    }
+
+    /**
+     * returns a Hook which can be registered on a Factory
+     * @param string $lifecycleStage stage at which the hook gets fired (e.g. before, beforeCreate, after)
+     * @param callable $callback     callback which gets executed
+     * @return Hook
+     */
+    public static function hook($lifecycleStage, $callback)
+    {
+        return new Hook($lifecycleStage, $callback);
+    }
+
+    /**
      * Define Factory and register it in the Repository.
      *
-     * @param  string $name       - name of the Factory
-     * @param  array  $properties - default properties for the Factory
-     * @param  array  $options    - ["class" => specify class, "aliases" => register Factory with additional names]
+     * @param  string $name       name of the Factory
+     * @param  array  $properties default properties for the Factory
+     * @param  array  $options
+     *  [
+     *    "class" => specify class,
+     *    "aliases" => register Factory with additional names,
+     *    "hooks" => array of FactoryBot::hook()
+     *  ]
      * @return void
      */
     public static function define(
         $name,
         $properties = [],
-        $options = ["class" => null, "aliases" => []]
+        $options = ["class" => null, "aliases" => [], "hooks" => []]
     ) {
         $_class = isset($options["class"]) ? $options["class"] : null;
         FactoryBot::validateClassParams($name, $_class);
         $class = FactoryBot::assumeClass($name, $_class);
         $factoryNames = isset($options["aliases"]) ? $options["aliases"] : [];
         $factoryNames[] = $name;
+        $hooks = isset($options["hooks"]) ? $options["hooks"] : [];
 
-        $factory = new Factory($class, $properties);
+        $factory = new Factory($class, $properties, $hooks);
         foreach ($factoryNames as $name) {
             Repository::registerFactory($name, $factory);
         }
@@ -61,23 +92,28 @@ class FactoryBot
     /**
      * Extend an existing Factory with more specific default params.
      *
-     * @param  string $name          - name of the Factory
-     * @param  string $parentFactory - name of the Factory, which will be inherited from
-     * @param  array  $properties    - default properties
-     * @param  array  $options       - ["aliases" => register Factory with additional names]
+     * @param  string $name          name of the Factory
+     * @param  string $parentFactory name of the Factory, which will be inherited from
+     * @param  array  $properties    default properties
+     * @param  array  $options
+     * [
+     *    "aliases" => register Factory with additional names,
+     *    "hooks" => array of FactoryBot::hook()
+     * ]
      * @return void
      */
     public static function extend(
         $name,
         $parentFactoryName,
         $properties = [],
-        $options = ["aliases" => []]
+        $options = ["aliases" => [], "hooks" => []]
     ) {
         $factoryNames = isset($options["aliases"]) ? $options["aliases"] : [];
         $factoryNames[] = $name;
+        $hooks = isset($options["hooks"]) ? $options["hooks"] : [];
 
         $parentFactory = Repository::findFactory($parentFactoryName);
-        $extendedFactory = $parentFactory->extend($properties);
+        $extendedFactory = $parentFactory->extend($properties, $hooks);
         foreach ($factoryNames as $name) {
             Repository::registerFactory($name, $extendedFactory);
         }
@@ -86,10 +122,10 @@ class FactoryBot
     /**
      * Build the specified model without saving it to the database.
      *
-     * @param  string $name      - name of the Factory
-     * @param  array  $overrides - model properties which should be overwritten
-     * @return object            - returns an instance of the defined model
-     * @throws InvalidArgumentException - throws when passed params are invalid
+     * @param  string $name             name of the Factory
+     * @param  array  $overrides        model properties which should be overwritten
+     * @return object                   returns an instance of the defined model
+     * @throws InvalidArgumentException throws when passed params are invalid
      */
     public static function build($name, $overrides = [])
     {
@@ -101,10 +137,10 @@ class FactoryBot
     /**
      * Create the specified model and save it to the database.
      *
-     * @param  string $name      - name of the Factory
-     * @param  array  $overrides - model properties which should be overwritten
-     * @return object            - returns an instance of the defined model
-     * @throws InvalidArgumentException - throws when passed params are invalid
+     * @param  string $name             name of the Factory
+     * @param  array  $overrides        model properties which should be overwritten
+     * @return object                   returns an instance of the defined model
+     * @throws InvalidArgumentException throws when passed params are invalid
      */
     public static function create($name, $overrides = [])
     {
@@ -116,9 +152,9 @@ class FactoryBot
     /**
      * Define an 1:1 or n:1 relation.
      *
-     * @param  string $name      - provide the name of the Factory which should be used
-     * @param  array  $overrides - model properties which should be overwirtten
-     * @return callable          - returns relation generator function for related model
+     * @param  string $name      provide the name of the Factory which should be used
+     * @param  array  $overrides model properties which should be overwirtten
+     * @return callable          returns relation generator function for related model
      */
     public static function relation($name, $overrides = [])
     {
@@ -133,10 +169,10 @@ class FactoryBot
     /**
      * Define a 1:n or n:m relation.
      *
-     * @param  string $name          - provide the name of the Factory which should be used
-     * @param  int    $defaultAmount - defines how many instances should be generated
-     * @param  array  $overrides     - model properties which should be overwirtten
-     * @return array                 - returns array of relation generator functions for related model
+     * @param  string $name          provide the name of the Factory which should be used
+     * @param  int    $defaultAmount defines how many instances should be generated
+     * @param  array  $overrides     model properties which should be overwirtten
+     * @return array                 returns array of relation generator functions for related model
      */
     public static function relations($name, $defaultAmount = 1, $overrides = [])
     {
@@ -151,8 +187,8 @@ class FactoryBot
     /**
      * Create an autoincrement id or provide a callable to generate a sequence.
      *
-     * @param  callable|null $callable - callable that returns unique values
-     * @return callable                - value generator function for the Factory
+     * @param  callable|null $callable callable that returns unique values
+     * @return callable                value generator function for the Factory
      */
     public static function sequence($callable = null)
     {
@@ -170,13 +206,14 @@ class FactoryBot
     }
 
     /**
-     * Remove all registered Factories.
+     * Remove all registered Factories and remove all hooks.
      *
      * @return void
      */
     public static function purge()
     {
         Repository::purge();
+        LifecycleHooksObserver::purge();
     }
 
     private static function validateClassParams($name, $class)

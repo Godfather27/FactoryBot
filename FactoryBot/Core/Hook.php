@@ -40,6 +40,11 @@ class Hook
         $this->setCallback($callback);
     }
 
+    /**
+     * execute hook
+     * @param mixed|null $instance hydrated model instance
+     * @return void
+     */
     public function run($instance)
     {
         call_user_func($this->callback, $instance);

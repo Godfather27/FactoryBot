@@ -52,6 +52,17 @@ class LifecycleHooksObserver
     }
 
     /**
+     * removes a Hook from the global Hook registry
+     * @param Hook $hook hook which should get removed
+     * @return void
+     */
+    public static function removeHook(Hook $hook)
+    {
+        $key = array_search($hook, self::$globalHooks);
+        unset(self::$globalHooks[$key]);
+    }
+
+    /**
      * remove all registered global hooks
      * @return void
      */

@@ -39,12 +39,23 @@ class FactoryBot
      * create a Hook which is triggered for all Factories
      * @param string $lifecycleStage stage at which the hook gets fired
      * @param callable $callback     callback which gets executed
-     * @return void
+     * @return Hook registered hook, can be used to remove it later with FactoryBot::removeGlobalHook($hook)
      */
     public static function registerGlobalHook($lifecycleStage, $callback)
     {
         $hook = new Hook($lifecycleStage, $callback);
         LifecycleHooksObserver::registerHook($hook);
+        return $hook;
+    }
+
+    /**
+     * removes a Hook from the hook registry
+     * @param Hook $hook Hook which should be removed
+     * @return void
+     */
+    public static function removeGlobalHook(Hook $hook)
+    {
+        LifecycleHooksObserver::removeHook($hook);
     }
 
     /**

@@ -309,6 +309,28 @@ $user = FactoryBot::build(UserModel::class); # logger output > "created an UserM
 $post = FactoryBot::build(PostModel::class); # logger output > "created an PostModel instance"
 ```
 
+A Hook can also be removed again.
+
+```php
+$logger = new Logger();
+
+$hook = FactoryBot::registerGlobalHook("afterCreate", function ($instance) use ($logger) {
+    $class = get_class($instance);
+    $logger->debug("created an $class instance");
+});
+
+FactoryBot::define(UserModel::class);
+FactoryBot::define(PostModel::class);
+
+$user = FactoryBot::build(UserModel::class); # logger output > "created an UserModel instance"
+$post = FactoryBot::build(PostModel::class); # logger output > "created an PostModel instance"
+
+FactoryBot::removeGlobalHook($hook);
+
+$user = FactoryBot::build(UserModel::class); # no logger output
+$post = FactoryBot::build(PostModel::class); # no logger output
+```
+
 ## using FactoryBot with php faker
 
 Faker methods should be wrapped by a callable. This way the faker method will be called during the build process.

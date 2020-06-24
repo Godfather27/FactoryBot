@@ -521,4 +521,19 @@ class FactoryBotTest extends TestCase
         $this->assertTrue($spy3, "should call 1st Factories `before` Hook");
         $this->assertTrue($spy4, "should call 2nd Factories `before` Hook");
     }
+
+    public function testGlobalHookIsRemovable()
+    {
+        $spy1 = false;
+
+        $hook = FactoryBot::registerGlobalHook("before", function () use (&$spy1) {
+            $spy1 = true;
+        });
+        FactoryBot::removeGlobalHook($hook);
+        FactoryBot::define(UserModel::class);
+
+        FactoryBot::build(UserModel::class);
+
+        $this->assertFalse($spy1, "should not call global `before` Hook");
+    }
 }

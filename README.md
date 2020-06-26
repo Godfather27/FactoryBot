@@ -287,7 +287,7 @@ FactoryBot::define(
     ]]
 );
 
-$user = FactoryBot::build(UserModel::class); # logger output > "created an UserModel instance: Jane Doe"
+$user = FactoryBot::create(UserModel::class); # logger output > "created an UserModel instance: Jane Doe"
 ```
 
 ### global Hook
@@ -305,8 +305,8 @@ FactoryBot::registerGlobalHook("afterCreate", function ($instance) use ($logger)
 FactoryBot::define(UserModel::class);
 FactoryBot::define(PostModel::class);
 
-$user = FactoryBot::build(UserModel::class); # logger output > "created an UserModel instance"
-$post = FactoryBot::build(PostModel::class); # logger output > "created an PostModel instance"
+$user = FactoryBot::create(UserModel::class); # logger output > "created an UserModel instance"
+$post = FactoryBot::create(PostModel::class); # logger output > "created an PostModel instance"
 ```
 
 A Hook can also be removed again.
@@ -322,13 +322,13 @@ $hook = FactoryBot::registerGlobalHook("afterCreate", function ($instance) use (
 FactoryBot::define(UserModel::class);
 FactoryBot::define(PostModel::class);
 
-$user = FactoryBot::build(UserModel::class); # logger output > "created an UserModel instance"
-$post = FactoryBot::build(PostModel::class); # logger output > "created an PostModel instance"
+$user = FactoryBot::create(UserModel::class); # logger output > "created an UserModel instance"
+$post = FactoryBot::create(PostModel::class); # logger output > "created an PostModel instance"
 
 FactoryBot::removeGlobalHook($hook);
 
-$user = FactoryBot::build(UserModel::class); # no logger output
-$post = FactoryBot::build(PostModel::class); # no logger output
+$user = FactoryBot::create(UserModel::class); # no logger output
+$post = FactoryBot::create(PostModel::class); # no logger output
 ```
 
 ## using FactoryBot with php faker

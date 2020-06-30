@@ -67,11 +67,11 @@ FactoryBot::define(
 
 It is highly recommended that you have one factory for each class that provides the simplest set of attributes necessary to create an instance of that class. Other factories can be created through inheritance to cover common scenarios for each class.
 
-Attempting to define multiple factories with the same name will raise an error.
+Attempting to define multiple factories with the same name will overwrite the previously defined factory.
 
 ## Using factories
 
-factory_bot supports several different build strategies: build, create
+FactoryBot supports several different build strategies: `build`, `create`
 
 ```php
 use FactoryBot\FactoryBot;
@@ -92,7 +92,7 @@ FactoryBot::build(UserModel::class, ["firstName" => "Jane"]);
 
 ## Aliases
 
-factory_bot allows you to define aliases to existing factories to make them easier to re-use. This could come in handy when, for example, your Post object has an author attribute that actually refers to an instance of a User class. While normally factory_bot can infer the factory name from the association name, in this case it will look for an author factory in vain. So, alias your user factory so it can be used under alias names.
+FactoryBot allows you to define aliases to existing factories to make them easier to re-use. This could come in handy when, for example, your Post object has an author attribute that actually refers to an instance of a User class. While normally FactoryBot can infer the factory name from the association name, in this case it will look for an author factory in vain. So, alias your user factory so it can be used under alias names.
 
 ```php
 FactoryBot::define(
@@ -347,7 +347,7 @@ FactoryBot::define(
     [
         "name" => "Jane Doe",
         # local variables have to be injected using use
-        "street" => function () use ($faker) { return $faker->streentName(); },
+        "street" => function () use ($faker) { return $faker->streetName(); },
     ]
 );
 ```
@@ -377,7 +377,7 @@ class FactorySetup
             [
                 "name" => "Jane Doe",
                 # instance variables can be accessed without use
-                "street" => function () { return $this->faker->streentName(); },
+                "street" => function () { return $this->faker->streetName(); },
             ]
         );
     }

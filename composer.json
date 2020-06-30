@@ -36,7 +36,7 @@
     "scripts": {
         "test": [
             "parallel-lint . --exclude vendor",
-            "phpunit tests/"
+            "phpunit tests/ --coverage-html tests/coverage/ --whitelist FactoryBot/"
         ]
     },
     "config": {

@@ -33,9 +33,4 @@ class ClassAnalyser
     {
         return "set" . ucfirst($propertyName);
     }
-
-    public static function getGetterFromPropertyName($propertyName)
-    {
-        return "get" . ucfirst($propertyName);
-    }
 }

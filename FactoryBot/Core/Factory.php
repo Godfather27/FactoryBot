@@ -3,8 +3,6 @@
 namespace FactoryBot\Core;
 
 use FactoryBot\Core\LifecycleHooksObserver;
-use FactoryBot\FactoryBot;
-use FactoryBot\Utils\Logger;
 use FactoryBot\Utils\ClassAnalyser;
 use FactoryBot\Exceptions\InvalidArgumentException;
 
@@ -64,7 +62,6 @@ class Factory
         $this->class = $class;
         $this->validateDefaultProperties($properties);
         $this->defaultProperties = $properties;
-        $this->logNotSetProperties();
         $this->hooks = $hooks;
         $this->observer = new LifecycleHooksObserver($hooks);
     }
@@ -128,6 +125,18 @@ class Factory
         return $this->sequence += 1;
     }
 
+    public function getNotSetProperties()
+    {
+        $setableProperties = ClassAnalyser::getSetableProperties($this->class);
+        $notSetProperties = [];
+        foreach ($setableProperties as $propertyName) {
+            if (!array_key_exists($propertyName, $this->defaultProperties)) {
+                $notSetProperties[] = $propertyName;
+            }
+        }
+        return $notSetProperties;
+    }
+
     private function compile($overrides, $buildStrategy)
     {
         $this->validateOverrides($overrides);
@@ -182,31 +191,5 @@ class Factory
         if (!ClassAnalyser::hasSetter($this->class, $propertyName)) {
             throw new InvalidArgumentException("$this->class has no setter for `$propertyName`!");
         }
-    }
-
-    private function logNotSetProperties()
-    {
-        if (!FactoryBot::$warnings) {
-            return;
-        }
-        $notSetProperties = $this->getNotSetProperties();
-        if (count($notSetProperties) > 0) {
-            $notSetPropertiesString = implode(", ", $notSetProperties);
-            Logger::warn(
-                "$this->class Factory not defined \$defaultProperties: " . $notSetPropertiesString
-            );
-        }
-    }
-
-    private function getNotSetProperties()
-    {
-        $setableProperties = ClassAnalyser::getSetableProperties($this->class);
-        $notSetProperties = [];
-        foreach ($setableProperties as $propertyName) {
-            if (!array_key_exists($propertyName, $this->defaultProperties)) {
-                $notSetProperties[] = $propertyName;
-            }
-        }
-        return $notSetProperties;
     }
 }

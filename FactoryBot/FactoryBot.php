@@ -2,11 +2,14 @@
 
 namespace FactoryBot;
 
+use Exception;
 use FactoryBot\Core\Hook;
 use FactoryBot\Core\Factory;
 use FactoryBot\Core\Repository;
 use FactoryBot\Core\LifecycleHooksObserver;
 use FactoryBot\Exceptions\InvalidArgumentException;
+use FactoryBot\Strategies\Build;
+use FactoryBot\Strategies\Create;
 
 /**
  * API Entrypoint
@@ -25,6 +28,7 @@ class FactoryBot
      */
     public static $warnings = false;
 
+
     /**
      * constructor disabled
      * no instance allowed
@@ -37,10 +41,11 @@ class FactoryBot
     }
 
     /**
-     * create a Hook which is triggered for all Factories
+     * Create a Hook which is triggered for all Factories
+     *
      * @param string $lifecycleStage stage at which the hook gets fired
      * @param callable $callback     callback which gets executed
-     * @return Hook registered hook, can be used to remove it later with FactoryBot::removeGlobalHook($hook)
+     * @return Hook registered       hook, can be used to remove it later with FactoryBot::removeGlobalHook($hook)
      */
     public static function registerGlobalHook($lifecycleStage, $callback)
     {
@@ -50,7 +55,8 @@ class FactoryBot
     }
 
     /**
-     * removes a Hook from the hook registry
+     * Remove a Hook from the hook registry
+     *
      * @param Hook $hook Hook which should be removed
      * @return void
      */
@@ -60,7 +66,8 @@ class FactoryBot
     }
 
     /**
-     * returns a Hook which can be registered on a Factory
+     * Create a Hook which can be registered on a Factory
+     *
      * @param string $lifecycleStage stage at which the hook gets fired (e.g. before, beforeCreate, after)
      * @param callable $callback     callback which gets executed
      * @return Hook
@@ -142,7 +149,7 @@ class FactoryBot
     public static function build($name, $overrides = [])
     {
         $factory = Repository::findFactory($name);
-        $classInstance = $factory->build($overrides);
+        $classInstance = $factory->run(Build::STRATEGY_NAME, $overrides);
         return $classInstance;
     }
 
@@ -157,8 +164,40 @@ class FactoryBot
     public static function create($name, $overrides = [])
     {
         $factory = Repository::findFactory($name);
-        $classInstance = $factory->create($overrides);
+        $classInstance = $factory->run(Create::STRATEGY_NAME, $overrides);
         return $classInstance;
+    }
+
+    /**
+     * Custom strategy to create an instance
+     *
+     * @param  string $name             name of the Factory
+     * @param  array  $overrides        model properties which should be overwritten
+     * @return object                   returns an instance of the defined model
+     * @throws InvalidArgumentException throws when passed params are invalid
+     */
+    public static function __callStatic($strategyName, $args)
+    {
+        if (!isset($args[0])) {
+            throw new InvalidArgumentException("No Factory name provided!");
+        }
+        $name = $args[0];
+        $overrides = isset($args[1]) ? $args[1] : [];
+        $factory = Repository::findFactory($name);
+        $instance = $factory->run($strategyName, $overrides);
+        return $instance;
+    }
+
+    /**
+     * Register a custom Strategy which can be used to create an instance.
+     *
+     * @param string $strategyName  the name of the strategy
+     * @param string $strategyClass the name of the strategy class
+     * @return void
+     */
+    public static function registerStrategy($strategyName, $strategyClass)
+    {
+        Repository::registerStrategy($strategyName, $strategyClass);
     }
 
     /**
@@ -173,7 +212,7 @@ class FactoryBot
         // gets called by Factory->hydrateClassInstance($model, $buildStrategy)
         return function ($model, $buildStrategy) use ($name, $overrides) {
             $factory = Repository::findFactory($name);
-            $classInstance = $factory->$buildStrategy($overrides);
+            $classInstance = $factory->run($buildStrategy, $overrides);
             return $classInstance;
         };
     }

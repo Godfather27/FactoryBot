@@ -3,8 +3,10 @@
 namespace FactoryBot\Core;
 
 use FactoryBot\Core\LifecycleHooksObserver;
+use FactoryBot\Exceptions\Exception;
 use FactoryBot\Utils\ClassAnalyser;
 use FactoryBot\Exceptions\InvalidArgumentException;
+use FactoryBot\FactoryBot;
 
 /**
  * Factory class builds hydrates instances of specified models
@@ -12,9 +14,6 @@ use FactoryBot\Exceptions\InvalidArgumentException;
  */
 class Factory
 {
-    const BUILD_STRATEGY_BUILD = "build";
-    const BUILD_STRATEGY_CREATE = "create";
-
     /**
      * class name used to construct a model by this Factory
      *
@@ -52,8 +51,8 @@ class Factory
     /**
      * Validate properties and save required params.
      *
-     * @param  string $class      - name of the model class
-     * @param  array  $properties - default properties for the model hydration
+     * @param  string $class      name of the model class
+     * @param  array  $properties default properties for the model hydration
      * @return void
      * @throws InvalidArgumentException
      */
@@ -67,45 +66,26 @@ class Factory
     }
 
     /**
-     * Create an instance of the specified model and hydrate it with the specified values.
+     * Compile a model and executes a strategy.
      *
-     * @param  array  $overrides     - model properties which should be overwritten
-     * @param  string $buildStrategy - wether the object should be saved, or not
-     * @return object                - instance of the specified model
+     * @param string $buildStrategy     Strategy which should be executed.
+     * @param array $overrides          model properties which should be overwritten
+     * @return object                   instane of the specified model
+     * @throws Exception
      * @throws InvalidArgumentException
      */
-    public function build($overrides)
+    public function run($buildStrategy, $overrides)
     {
-        $this->observer->notify("before");
-        $this->observer->notify("beforeBuild");
-        $this->compile($overrides, self::BUILD_STRATEGY_BUILD);
-        $this->observer->notify("afterBuild", $this->classInstance);
-        $this->observer->notify("after", $this->classInstance);
-        return $this->classInstance;
-    }
-
-    /**
-     * Build and save an instance of the specified model.
-     *
-     * @param  array $overrides - model properties which should be overwritten
-     * @return object           - instance of the specified model
-     * @throws InvalidArgumentException
-     */
-    public function create($overrides)
-    {
-        $this->observer->notify("before");
-        $this->observer->notify("beforeCreate");
-        $this->compile($overrides, self::BUILD_STRATEGY_CREATE);
-        $this->classInstance->save();
-        $this->observer->notify("afterCreate", $this->classInstance);
-        $this->observer->notify("after", $this->classInstance);
-        return $this->classInstance;
+        $strategy = Repository::findStrategy($buildStrategy);
+        $strategy::beforeCompile($this);
+        $this->compile($overrides, $buildStrategy);
+        return $strategy::result($this, $this->classInstance);
     }
 
     /**
      * Extend existing Factory with more specific properties.
      *
-     * @param  array $properties - default properties
+     * @param  array $properties default properties
      * @return Factory
      */
     public function extend($properties, $hooks)
@@ -125,6 +105,11 @@ class Factory
         return $this->sequence += 1;
     }
 
+    /**
+     * inspect which properties will not be set by this Factory
+     *
+     * @return array list of properties which will not be set by this Factory
+     */
     public function getNotSetProperties()
     {
         $setableProperties = ClassAnalyser::getSetableProperties($this->class);
@@ -135,6 +120,17 @@ class Factory
             }
         }
         return $notSetProperties;
+    }
+
+    /**
+     * Notify the factories observer
+     *
+     * @param string $lifeCycleStage lifecyclestage which was reached
+     * @return void
+     */
+    public function notify($lifeCycleStage)
+    {
+        $this->observer->notify($lifeCycleStage, $this->classInstance);
     }
 
     private function compile($overrides, $buildStrategy)

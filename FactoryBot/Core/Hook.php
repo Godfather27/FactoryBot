@@ -28,10 +28,11 @@ class Hook
     ];
 
     /**
-     * Hook will be executed on different Factory
-     * lifecycle stages
-     * @param string $lifecycleStage - name of the lifecycle stage
-     * @param callable $callback - callback which should be called
+     * Create a Hook instance.
+     * Hook will be executed on different Factory lifecycle stages
+     *
+     * @param string $lifecycleStage name of the lifecycle stage
+     * @param callable $callback     callback which should be called
      * @return void
      */
     public function __construct($lifecycleStage, $callback)
@@ -41,7 +42,8 @@ class Hook
     }
 
     /**
-     * execute hook
+     * execute Hook
+     *
      * @param mixed|null $instance hydrated model instance
      * @return void
      */

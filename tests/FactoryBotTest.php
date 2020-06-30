@@ -6,7 +6,10 @@ use FactoryBot\FactoryBot;
 use PHPUnit\Framework\TestCase;
 use FactoryBot\Tests\TestModels\CarModel;
 use FactoryBot\Tests\TestModels\UserModel;
+use FactoryBot\Strategies\StrategyInterface;
 use FactoryBot\Tests\TestModels\AccountModel;
+use FactoryBot\Tests\TestStrategies\JSONStrategy;
+use FactoryBot\Tests\TestStrategies\BadStrategy;
 
 /**
  * BDD Test class for FactoryBot
@@ -592,5 +595,60 @@ class FactoryBotTest extends TestCase
         );
 
         FactoryBot::define(UserModel::class, [], ["hooks" => [$hook]]);
+    }
+
+    public function testUsesCustomStrategy()
+    {
+        $expected = json_encode([
+            "id" => null,
+            "firstName" => "Jane",
+            "lastName" => null,
+            "email" => null,
+            "account" => null,
+            "role" => null,
+            "cars" => null,
+            "subordinate" => null,
+            "new" => true
+        ]);
+        FactoryBot::registerStrategy("json", JSONStrategy::class);
+        FactoryBot::define(UserModel::class, ["firstName" => "Jane"]);
+
+        $json = FactoryBot::json(UserModel::class);
+
+        $this->assertEquals($expected, $json, "should return hydrated json object");
+    }
+
+    public function testRejectsCustomStrategyNoFactoryProvided()
+    {
+        FactoryBot::registerStrategy("json", JSONStrategy::class);
+
+        $this->setExpectedException(
+            "FactoryBot\Exceptions\InvalidArgumentException",
+            "No Factory name provided!"
+        );
+
+        FactoryBot::json();
+    }
+
+    public function testFailsOnStrategyWithoutInterface()
+    {
+        $this->setExpectedException(
+            "FactoryBot\Exceptions\Exception",
+            sprintf("Strategy `%s` must implement `%s`", BadStrategy::class, StrategyInterface::class)
+        );
+        FactoryBot::registerStrategy("bad", BadStrategy::class);
+        FactoryBot::define(UserModel::class);
+        FactoryBot::bad(UserModel::class);
+    }
+
+    public function testFailsOnUnregisteredStrategy()
+    {
+        $this->setExpectedException(
+            "FactoryBot\Exceptions\Exception",
+            "Strategy `json` not defined!"
+        );
+
+        FactoryBot::define(UserModel::class);
+        FactoryBot::json(UserModel::class);
     }
 }

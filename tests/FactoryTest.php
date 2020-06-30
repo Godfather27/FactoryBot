@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 use FactoryBot\Tests\TestModels\UserModel;
 
 /**
- * BDD Test class for FactoryBot
+ * BDD Test class for Factory
  * @package FactoryBot\Tests
  */
 class FactoryTest extends TestCase

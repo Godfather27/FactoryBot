@@ -255,6 +255,50 @@ $user = FactoryBot::build(UserModel::class);
 $user->getEmail() # > "user1@example.com"
 ```
 
+## Custom Strategies
+
+The capability of FactoryBot can be extended by implementing custom Strategies.
+
+A Strategy must implement the `FactoryBot/Strategies/StrategyInterface` Interface.
+The Interface defines two methods. `beforeCompile` is a method which gets called before the hydration step is executed. The second method is `result` which gets called after the hydration step, here you can do some changes to the instance before returning it.
+
+In this example the Strategy will return the instance as a JSON string.
+
+```php
+use FactoryBot\Strategies\StrategyInterface;
+
+class JsonStrategy implements StrategyInterface
+{
+    public static function beforeCompile($factory)
+    {
+        // we call $factory->notify to ensure the Factories "before" Hooks get called
+        $factory->notify("before");
+    }
+
+    public static function result($factory, $instance)
+    {
+        // we call $factory->notify to ensure the Factories "after" Hooks get called
+        $factory->notify("after");
+
+        $result = self::getPropertiesArray($instance);
+
+        return json_encode($result);
+    }
+
+    public static function getPropertiesArray($instance)
+    {
+        $instanceArray = (array) $instance;
+        $result = [];
+        foreach ($instanceArray as $keyWithVisibility => $value) {
+            $keySegments = explode("\0", $keyWithVisibility);
+            $keyWithoutVisibility = end($keySegments);
+            $result[$keyWithoutVisibility] = $value;
+        }
+        return $result;
+    }
+}
+```
+
 ## Lifecycle Hooks
 
 FactoryBot provides 6 different hooks to inject custom code.

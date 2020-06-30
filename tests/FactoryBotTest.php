@@ -19,6 +19,13 @@ class FactoryBotTest extends TestCase
         FactoryBot::purge();
     }
 
+    public function testFailsOnUndefinedFactory()
+    {
+        $this->setExpectedException("FactoryBot\Exceptions\Exception", "Factory `User` not defined!");
+
+        FactoryBot::build("User");
+    }
+
     public function testBuildsSpecifiedClass()
     {
         $expected = UserModel::class;
@@ -119,6 +126,15 @@ class FactoryBotTest extends TestCase
     }
 
     public function testRejectsMalformatedOverrides2()
+    {
+        FactoryBot::define(UserModel::class);
+
+        $this->setExpectedException("InvalidArgumentException", "propertyName `0` must be a `string`!");
+
+        FactoryBot::build(UserModel::class, [0 => "nick"]);
+    }
+
+    public function testRejectsNotExistingProperties()
     {
         FactoryBot::define(UserModel::class);
 
@@ -535,5 +551,46 @@ class FactoryBotTest extends TestCase
         FactoryBot::build(UserModel::class);
 
         $this->assertFalse($spy1, "should not call global `before` Hook");
+    }
+
+    public function testRejectsHookWithInvalidLifecycleStageName()
+    {
+        $lifecycleStage = "zuerst";
+
+        $this->setExpectedException(
+            "FactoryBot\Exceptions\InvalidArgumentException",
+            "Invalid Hook: lifecycle stage `$lifecycleStage` does not exist."
+        );
+
+        FactoryBot::registerGlobalHook($lifecycleStage, function () {
+        });
+    }
+
+    public function testRejectsHookWithInvalidCallback()
+    {
+        $callback = "not callable";
+
+        $this->setExpectedException(
+            "FactoryBot\Exceptions\InvalidArgumentException",
+            "Invalid Hook: callback not executable."
+        );
+
+        FactoryBot::registerGlobalHook("before", $callback);
+    }
+
+    public function testFactoryRejectsNonHookCallbacks()
+    {
+        $hook = [
+            "lifecycleStage" => "before",
+            "callback" => function () {
+            }
+        ];
+
+        $this->setExpectedException(
+            "FactoryBot\Exceptions\InvalidArgumentException",
+            "invalid Hook used in definition of Factory"
+        );
+
+        FactoryBot::define(UserModel::class, [], ["hooks" => [$hook]]);
     }
 }

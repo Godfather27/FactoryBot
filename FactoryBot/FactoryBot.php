@@ -28,6 +28,7 @@ class FactoryBot
     /**
      * constructor disabled
      * no instance allowed
+     * @codeCoverageIgnore
      *
      * @return void
      */

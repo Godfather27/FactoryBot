@@ -265,6 +265,7 @@ The Interface defines two methods. `beforeCompile` is a method which gets called
 In this example the Strategy will return the instance as a JSON string.
 
 ```php
+use FactoryBot\FactoryBot;
 use FactoryBot\Strategies\StrategyInterface;
 
 class JsonStrategy implements StrategyInterface
@@ -297,6 +298,10 @@ class JsonStrategy implements StrategyInterface
         return $result;
     }
 }
+
+FactoryBot::registerStrategy("json", JsonStrategy::class);
+FactoryBot::define(UserModel::class, ["firstName" => "Jane"]);
+FactoryBot::json(UserModel::class); # > '{"id":null,"firstName":"Jane",...,"subordinate":null,"new":true}'
 ```
 
 ## Lifecycle Hooks

@@ -40,7 +40,7 @@
             "phpunit tests/ --coverage-html tests/coverage/ --whitelist FactoryBot/"
         ],
         "lint": "parallel-lint . --exclude vendor",
-        "unit-test": "phpunit tests/ --coverage-xml tests/coverage --whitelist FactoryBot/"
+        "unit-test": "phpunit tests/ --coverage-clover tests/coverage/coverage.xml --whitelist FactoryBot/"
     },
     "config": {
         "sort-packages": true

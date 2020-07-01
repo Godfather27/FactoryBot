@@ -31,13 +31,16 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "FactoryBot\\Tests\\": "tests/"}
+            "FactoryBot\\Tests\\": "tests/"
+        }
     },
     "scripts": {
         "test": [
-            "parallel-lint . --exclude vendor",
-            "phpunit tests/ --coverage-html tests/coverage/ --whitelist FactoryBot/"
-        ]
+            "@lint",
+            "@unit-test --coverage-html tests/coverage/ --whitelist FactoryBot/"
+        ],
+        "lint": "parallel-lint . --exclude vendor",
+        "unit-test": "phpunit tests/"
     },
     "config": {
         "sort-packages": true

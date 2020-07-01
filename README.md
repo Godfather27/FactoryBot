@@ -1,3 +1,5 @@
+![Version](https://img.shields.io/github/v/tag/Godfather27/FactoryBot?label=latest%20version) ![PHP Composer](https://github.com/Godfather27/FactoryBot/workflows/PHP%20Composer/badge.svg) ![Coverage](https://img.shields.io/codecov/c/github/Godfather27/FactoryBot)
+
 # FactoryBot
 
 This is inspired by thoughtbot's ruby [factory_bot](https://github.com/thoughtbot/factory_bot).

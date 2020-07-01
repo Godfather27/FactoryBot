@@ -34,3 +34,8 @@ jobs:
 
     - name: Run test suite
       run: composer run-script unit-test
+    
+    - name: Codecov
+      uses: codecov/codecov-action@v1.0.7
+      with:
+        file: ./tests/coverage/coverage.xml

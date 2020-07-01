@@ -20,13 +20,21 @@ class LifecycleHooksObserver
      */
     private $factoryHooks = [];
 
+    /**
+     * Create Factory instance
+     *
+     * @param array $hooks hooks which should be registered for this Factory
+     * @return void
+     * @throws InvalidArgumentException
+     */
     public function __construct($hooks)
     {
         $this->setFactoryHooks($hooks);
     }
 
     /**
-     * call all hooks registered for a specific factory.
+     * call all Hooks registered for a specific factory.
+     *
      * @param string $lifecycleStageName name of the lifecycle stage
      * @param mixed|null $instance       hydrated instance of a model
      * @return void
@@ -41,8 +49,9 @@ class LifecycleHooksObserver
     }
 
     /**
-     * register a global hook
-     * globally registered hooks will be executed on each factory.
+     * Register a global hook
+     * globally registered hooks will be executed on each Factory.
+     *
      * @param Hook $hook hook which should be registered
      * @return void
      */
@@ -52,7 +61,8 @@ class LifecycleHooksObserver
     }
 
     /**
-     * removes a Hook from the global Hook registry
+     * Remove Hook from the global Hook registry
+     *
      * @param Hook $hook hook which should get removed
      * @return void
      */
@@ -64,6 +74,7 @@ class LifecycleHooksObserver
 
     /**
      * remove all registered global hooks
+     *
      * @return void
      */
     public static function purge()
@@ -82,8 +93,8 @@ class LifecycleHooksObserver
     }
 
     /**
-     * gets all hooks relevant for a specific Factory.
-     * global and factory hooks
+     * Get global and factory hooks relevant for this Factory.
+     *
      * @return array array with hooks
      */
     private function getHooks()

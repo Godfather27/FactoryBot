@@ -37,10 +37,10 @@
     "scripts": {
         "test": [
             "@lint",
-            "@unit-test --coverage-html tests/coverage/ --whitelist FactoryBot/"
+            "phpunit tests/ --coverage-html tests/coverage/ --whitelist FactoryBot/"
         ],
         "lint": "parallel-lint . --exclude vendor",
-        "unit-test": "phpunit tests/"
+        "unit-test": "phpunit tests/ --coverage-xml tests/coverage --whitelist FactoryBot/"
     },
     "config": {
         "sort-packages": true

@@ -9,17 +9,9 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        php_version: ['5.6', '7.0', '7.4']
 
     steps:
     - uses: actions/checkout@v2
-
-    - name: Setup PHP Version ${{ matrix.php_version }}
-      uses: khs1994-docker/actions-setup-php@0.0.1
-      with:
-        php_version: ${{ matrix.php_version }}
 
     - name: Validate composer.json and composer.lock
       run: composer validate

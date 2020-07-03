@@ -108,7 +108,7 @@ FactoryBot::define(
     [
         "title" => "lorem ipsum!",
         "body" => "lorem ipsum dolor sit amet",
-        "author" => FatoryBot::relation("Author")
+        "author" => FactoryBot::relation("Author")
     ]
 );
 
@@ -116,7 +116,7 @@ FactoryBot::define(
     CommentModel::class,
     [
         "body" => "lorem ipsum dolor sit amet",
-        "commenter" => FatoryBot::relation("Commenter")
+        "commenter" => FactoryBot::relation("Commenter")
     ]
 );
 ```
@@ -176,7 +176,7 @@ FactoryBot::define(
     [
         "title" => "lorem ipsum!",
         "body" => "lorem ipsum dolor sit amet",
-        "author" => FatoryBot::relation("Author")
+        "author" => FactoryBot::relation("Author")
     ]
 );
 ```
@@ -186,7 +186,7 @@ Relations default to using the same build strategy as their parent object:
 ```php
 FactoryBot::define(
     PostModel::class,
-    ["author" => FatoryBot::relation("Author")]
+    ["author" => FactoryBot::relation("Author")]
 );
 
 $post = FactoryBot::create(PostModel::class);
@@ -203,7 +203,7 @@ To generate has many relationships you can use the relations method:
 ```php
 FactoryBot::define(
     UserModel::class,
-    ["posts" => FatoryBot::relations(PostModel::class, 2)]
+    ["posts" => FactoryBot::relations(PostModel::class, 2)]
 );
 
 $user = FactoryBot::build(UserModel::class);
@@ -218,7 +218,7 @@ FactoryBot::define(
     [
         "firstName" => "Jane",
         "lastName" => "Doe",
-        "subordinate" => FatoryBot::relation(
+        "subordinate" => FactoryBot::relation(
             UserModel::class,
             ["subordinate" => null]
         )

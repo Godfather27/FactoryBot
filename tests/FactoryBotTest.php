@@ -2,6 +2,7 @@
 
 namespace FactoryBot\Tests;
 
+use FactoryBot\Core\Repository;
 use FactoryBot\FactoryBot;
 use PHPUnit\Framework\TestCase;
 use FactoryBot\Tests\TestModels\CarModel;
@@ -17,7 +18,7 @@ use FactoryBot\Tests\TestStrategies\BadStrategy;
  */
 class FactoryBotTest extends TestCase
 {
-    protected function setUp()
+    protected function tearDown()
     {
         FactoryBot::purge();
     }
@@ -650,5 +651,29 @@ class FactoryBotTest extends TestCase
 
         FactoryBot::define(UserModel::class);
         FactoryBot::json(UserModel::class);
+    }
+
+    public function testLoadsDefaultDefinitionsPath()
+    {
+        FactoryBot::findDefinitions();
+        $factory = Repository::findFactory(UserModel::class);
+        $this->assertNotEmpty($factory, "should load factory under default path");
+    }
+
+    public function testLoadsCustomDefinitionsPath()
+    {
+        FactoryBot::setDefinitionsBasePath("tests/MyFactories/");
+        FactoryBot::findDefinitions();
+        $factory = Repository::findFactory(UserModel::class);
+        $this->assertNotEmpty($factory, "should load factory under custom path");
+    }
+
+    public function testFailsOnNotExistingDefinitionsPath()
+    {
+        FactoryBot::setDefinitionsBasePath("tests/not_found/");
+
+        $this->setExpectedException("FactoryBot\Exceptions\Exception", "`tests/not_found/` is no directory");
+
+        FactoryBot::findDefinitions();
     }
 }

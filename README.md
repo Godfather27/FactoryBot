@@ -12,36 +12,6 @@ Install the latest version with
 
         $ composer require factory-bot/factory-bot
 
-## Configure your test suite
-
-### PHPUnit
-
-use `FactoryBot\FactoryBot` in your bootstrap `setup.php` file.
-
-Define all Factories you want to use in your setup file.
-
-`phpunit.xml`
-
-```xml
-<?xml version="1.0" encoding="UTF-8" ?>
-<phpunit bootstrap="tests/setup.php">
-```
-
-`tests/setup.php`
-
-```php
-// setup other stuff
-
-use FactoryBot\FactoryBot;
-
-FactoryBot::define(
-    UserModel::class,
-    ["firstName" => "John", "lastName" => "Doe"]
-);
-
-// define more Factories
-```
-
 ## Defining factories
 
 Each factory has a name and a set of attributes. The name is used to guess the class of the object by default:
@@ -70,6 +40,32 @@ FactoryBot::define(
 It is highly recommended that you have one factory for each class that provides the simplest set of attributes necessary to create an instance of that class. Other factories can be created through inheritance to cover common scenarios for each class.
 
 Attempting to define multiple factories with the same name will overwrite the previously defined factory.
+
+## Loading definitions
+
+The default path to define definitions is `tests/factories`. You can create a File for each Model you want to define a Factory for. For example you could create a `tests/factories/UserModel.php` file where you define a base Factory and different Factories extending from the base Factory.
+
+Your file structure could look like this:
+
+```
+.
+├── src
+├── tests
+│   ├── factories
+│   │   ├── UserModel.php    # Factory definitions for UserModel
+│   │   └── AccountModel.php # Factory definitions for AccountModel
+│   ├── ... # tests
+│   └── ... # tests
+└── README.md
+```
+
+Before using the Factories in your test files you can load them by calling `FactoryBot::findDefinitions();`.
+
+If you are using PHPUnit this can be done in your bootstrap file.
+
+If you need to save your factories in a different location for your project, you can specify it by using `FactoryBot::setDefinitionsBasePath("your/path/factories/");`.
+
+You also have the possibility to define your Factories inline and omit calling `findDefinitions`.
 
 ## Using factories
 

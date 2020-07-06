@@ -2,11 +2,11 @@
 
 namespace FactoryBot;
 
-use Exception;
 use FactoryBot\Core\Hook;
 use FactoryBot\Core\Factory;
 use FactoryBot\Core\Repository;
 use FactoryBot\Core\LifecycleHooksObserver;
+use FactoryBot\Exceptions\Exception;
 use FactoryBot\Exceptions\InvalidArgumentException;
 use FactoryBot\Strategies\Build;
 use FactoryBot\Strategies\Create;
@@ -254,6 +254,28 @@ class FactoryBot
         return function ($model) {
             return Repository::findFactory(get_class($model))->getNextSequenceValue();
         };
+    }
+
+    /**
+     * Specify where definition files are located
+     *
+     * @param string $path path to definition files
+     * @return void
+     */
+    public static function setDefinitionsBasePath($path)
+    {
+        Repository::$definitionsBaseDirectory = $path;
+    }
+
+    /**
+     * Load Factory definitions
+     *
+     * @return void
+     * @throws Exception throws if definition path does not exist
+     */
+    public static function findDefinitions()
+    {
+        Repository::findDefinitions();
     }
 
     /**

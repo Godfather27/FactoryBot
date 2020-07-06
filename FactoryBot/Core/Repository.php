@@ -2,7 +2,10 @@
 
 namespace FactoryBot\Core;
 
+use FilesystemIterator;
 use FactoryBot\Core\Factory;
+use RecursiveIteratorIterator;
+use RecursiveDirectoryIterator;
 use FactoryBot\Strategies\Build;
 use FactoryBot\Strategies\Create;
 use FactoryBot\Exceptions\Exception;
@@ -14,6 +17,19 @@ use FactoryBot\Strategies\StrategyInterface;
  */
 class Repository
 {
+    /**
+     * Default path for factory definitions
+     */
+    const DEFAULT_DEFINITIONS_BASE_DIRECTORY = "tests/factories/";
+
+    /**
+     * base directory where Factories are defined.
+     * can be overwritten to load definitions with a different folder structure.
+     *
+     * @var string
+     */
+    public static $definitionsBaseDirectory = self::DEFAULT_DEFINITIONS_BASE_DIRECTORY;
+
     /**
      * all registered factories
      *
@@ -32,6 +48,43 @@ class Repository
     ];
 
     /**
+     * Load Factory definitions
+     *
+     * @return void
+     * @throws Exception throws if definition path does not exist
+     */
+    public static function findDefinitions()
+    {
+        if (!is_dir(self::$definitionsBaseDirectory)) {
+            throw new Exception(sprintf("`%s` is no directory", self::$definitionsBaseDirectory));
+        }
+
+        foreach (self::createFileIterator() as $file) {
+            self::loadDefinition($file);
+        }
+    }
+
+    private static function loadDefinition($file)
+    {
+        $filename = $file->getFilename();
+        if (preg_match("/\.php$/", $filename)) {
+            require $file->getPathname();
+        }
+    }
+
+    private static function createFileIterator()
+    {
+        $dir = new RecursiveDirectoryIterator(self::$definitionsBaseDirectory, FilesystemIterator::SKIP_DOTS);
+        $iterator = new RecursiveIteratorIterator($dir);
+        return $iterator;
+    }
+
+    private static function resetDefinitionsBaseDirectory()
+    {
+        self::$definitionsBaseDirectory = self::DEFAULT_DEFINITIONS_BASE_DIRECTORY;
+    }
+
+    /**
      * delete all factories and custom strategies
      *
      * @return void
@@ -40,6 +93,7 @@ class Repository
     {
         self::purgeFactories();
         self::purgeStrategies();
+        self::resetDefinitionsBaseDirectory();
     }
 
     /**

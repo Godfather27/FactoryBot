@@ -164,18 +164,7 @@ As mentioned above, it's good practice to define a basic factory for each class 
 
 ## Relations
 
-It's possible to set up relations within factories. Use the relation method from FactoryBot and provide the Factory which should be used.
-
-```php
-FactoryBot::define(
-    PostModel::class,
-    [
-        "title" => "lorem ipsum!",
-        "body" => "lorem ipsum dolor sit amet",
-        "author" => FactoryBot::relation("Author")
-    ]
-);
-```
+It's possible to set up relationships within factories.
 
 Relations default to using the same build strategy as their parent object:
 
@@ -194,6 +183,23 @@ $post2->isNew();              # > true
 $post2->getAuthor()->isNew(); # > true
 ```
 
+### Single Relation
+
+Use the relation method from FactoryBot and provide the Factory which should be used.
+
+```php
+FactoryBot::define(
+    PostModel::class,
+    [
+        "title" => "lorem ipsum!",
+        "body" => "lorem ipsum dolor sit amet",
+        "author" => FactoryBot::relation("Author")
+    ]
+);
+```
+
+### Many Relations
+
 To generate has many relationships you can use the relations method:
 
 ```php
@@ -205,6 +211,8 @@ FactoryBot::define(
 $user = FactoryBot::build(UserModel::class);
 $user->getPosts(); # > [PostModel, PostModel]
 ```
+
+### Cyclic Relation
 
 To generate cyclic relationships you should set children to `null` to avoid infinite children generation:
 
@@ -226,6 +234,38 @@ $user->getSubordinate(); # > UserModel
 $user->getSubordinate()->getSubordinate(); # > null
 ```
 
+### Shared Dependencies
+
+If you want to share dependend instances in your Factory definition, you can use the closure style definition.
+This could be useful for advanced usecases, but adds complexity to the definition so it is recommended to use this definition style on extended Factories only.
+
+```php
+FactoryBot::extend(
+    "Supervisor",
+    UserModel::class,
+    [
+        "company" => FactoryBot::relation(CompanyModel::class),
+        "subordinate" => function ($user, $buildStrategy) {
+            return FactoryBot::relation(
+                UserModel::class,
+                [
+                    "company" => $user->getCompany(), # subordinate works in the same company as its supervisor
+                    "subordinate" => null
+                ]
+            )(null, $buildStrategy); # call the relation with null and the parent's build strategy
+        }
+    ]
+);
+```
+
+Keep in mind you can also manually share models when creating test data.
+This also helps developers understand dependencies for a test case more easily.
+
+```php
+$company = FactoryBot::build(CompanyModel::class);
+$subordinate = FactoryBot::build(UserModel::class, ["subordinate" => null, "company" => $company]);
+$user = FactoryBot::build(UserModel::class, ["subordinate" => $subordinate, "company" => $company]);
+```
 
 ## Sequences
 

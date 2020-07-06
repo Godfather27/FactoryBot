@@ -6,6 +6,26 @@ This is inspired by thoughtbot's ruby [factory_bot](https://github.com/thoughtbo
 
 FactoryBot is a fixtures replacement with a straightforward definition syntax, support for multiple build strategies (saved instances, unsaved instances), and support for multiple factories for the same class (user, admin_user, and so on), including factory inheritance.
 
+## Table of Contents
+ * [Installation](#installation)
+ * [Defining factories](#defining-factories)
+ * [Loading definitions](#loading-definitions)
+ * [Using factories](#using-factories)
+ * [Aliases](#aliases)
+ * [Dependent Attributes](#dependent-attributes)
+ * [Inheritance](#inheritance)
+ * [Relations](#relations)
+    * [Single Relation](#single-relation)
+    * [Many Relations](#many-relations)
+    * [Cyclic Relation](#cyclic-relation)
+    * [Shared Dependencies](#shared-dependencies)
+ * [Sequences](#sequences)
+ * [Custom Strategies](#custom-strategies)
+ * [Lifecycle Hooks](#lifecycle-hooks)
+    * [Hook per Factory](#hook-per-factory)
+    * [global Hook](#global-hook)
+ * [using FactoryBot with php faker](#using-factorybot-with-php-faker)
+
 ## Installation
 
 Install the latest version with

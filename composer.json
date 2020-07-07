@@ -2,7 +2,7 @@
     "name": "factory-bot/factory-bot",
     "type": "library",
     "description": "Fixtures replacement with a straightforward definition syntax",
-    "keywords": ["factory_bot","fixture","factory","bot", "testing"],
+    "keywords": ["factory_bot","fixture","factory","bot", "testing", "data", "factorybot", "factorygirl", "factoryboy"],
     "homepage": "https://github.com/Godfather27/FactoryBot",
     "license": "MIT",
     "authors": [

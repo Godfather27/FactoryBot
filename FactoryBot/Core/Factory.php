@@ -2,11 +2,11 @@
 
 namespace FactoryBot\Core;
 
+use Closure;
 use FactoryBot\Core\LifecycleHooksObserver;
 use FactoryBot\Exceptions\Exception;
 use FactoryBot\Utils\ClassAnalyser;
 use FactoryBot\Exceptions\InvalidArgumentException;
-use FactoryBot\FactoryBot;
 
 /**
  * Factory class builds hydrates instances of specified models
@@ -155,7 +155,7 @@ class Factory
     private function resolveValue($value)
     {
         $value = is_array($value) ? array_map([$this, "resolveValue"], $value) : $value;
-        return is_callable($value) ? $value($this->classInstance, $this->buildStrategy) : $value;
+        return $value instanceof Closure ? $value($this->classInstance, $this->buildStrategy) : $value;
     }
 
     private function validateDefaultProperties($properties)
